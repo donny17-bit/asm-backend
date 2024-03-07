@@ -1,23 +1,28 @@
 package main
 
-// import "fmt"
 import (
 	"asm-backend/web"
 	"fmt"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	// router := gin.New()
 	router := gin.Default()
 
-	router.GET("/api/ping", web.Production)
-	// Web.Production()
-	// router.GET(apiRouter+"/Ping", WebAdmin.Article)
+	err := godotenv.Load()
 
-	// port := ":8080"
+	if err != nil {
+		fmt.Print("Load env failed")
+		return
+	}
+
+	// routing
+	router.GET("/api/production", web.Production)
+
 	port := os.Getenv("PORT")
 	fmt.Print("you are using port : ", port)
 	router.Run(":" + port)
