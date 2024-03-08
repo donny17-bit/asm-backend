@@ -1,6 +1,7 @@
 package main
 
 import (
+	"asm-backend/auth"
 	"asm-backend/web"
 	"fmt"
 	"os"
@@ -10,7 +11,6 @@ import (
 )
 
 func main() {
-	// router := gin.New()
 	router := gin.Default()
 
 	err := godotenv.Load()
@@ -22,6 +22,7 @@ func main() {
 
 	// routing
 	router.GET("/api/production", web.Production)
+	router.GET("/api/login", auth.Login)
 
 	port := os.Getenv("PORT")
 	fmt.Print("you are using port : ", port)

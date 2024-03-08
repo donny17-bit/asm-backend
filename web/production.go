@@ -13,7 +13,7 @@ func Production(c *gin.Context) {
 		"message": "This is the production function",
 	})
 
-	db, err := helper.SqlConnect()
+	db, err := helper.SqlModel()
 
 	if err != nil {
 		fmt.Println("error to connect to database")

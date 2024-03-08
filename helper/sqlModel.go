@@ -10,7 +10,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func SqlConnect() (*sql.DB, error) {
+func SqlModel() (*sql.DB, error) {
 
 	err := godotenv.Load()
 
@@ -20,10 +20,10 @@ func SqlConnect() (*sql.DB, error) {
 		return nil, err
 	}
 
-	hostname := os.Getenv("host")
-	username := os.Getenv("username")
-	password := os.Getenv("password")
-	database := os.Getenv("database")
+	hostname := os.Getenv("hostname_sql")
+	username := os.Getenv("username_sql")
+	password := os.Getenv("password_sql")
+	database := os.Getenv("database_sql")
 
 	query := url.Values{}
 	query.Add("database", database)
