@@ -27,13 +27,6 @@ func OraModel() (*sql.DB, error) {
 		return nil, err
 	}
 
-	// databaseStr := os.Getenv("database_oracle")
-	// database, err := strconv.Atoi(databaseStr)
-	// if err != nil {
-	//     fmt.Println("Error converting database to integer:", err)
-	//     return
-	// }
-
 	service_name := os.Getenv("service_name_oracle")
 	hostname := os.Getenv("hostname_oracle")
 	username := os.Getenv("username_oracle")
@@ -43,7 +36,8 @@ func OraModel() (*sql.DB, error) {
 	conn, err := sql.Open("oracle", connStr)
 
 	if err != nil {
-		fmt.Println("error connecting to oracle database")
+		fmt.Println("error connecting to oracle database : ", err)
+		return nil, err
 	}
 
 	fmt.Println("connection to oracle database success")

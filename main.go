@@ -24,6 +24,8 @@ func main() {
 	router.GET("/api/production", web.Production)
 	router.GET("/api/login", auth.Login)
 
+	router.POST("/api/login", auth.PostLogin)
+
 	port := os.Getenv("PORT")
 	fmt.Print("you are using port : ", port)
 	router.Run(":" + port)
