@@ -23,8 +23,10 @@ func main() {
 	// routing
 	router.GET("/api/production", web.Production)
 	router.GET("/api/login", auth.Login)
+	router.GET("/api/refresh", auth.RefreshLogin)
 
 	router.POST("/api/login", auth.PostLogin)
+	// router.POST("/api/login", auth.Jwt().LoginHandler)
 
 	port := os.Getenv("PORT")
 	fmt.Print("you are using port : ", port)

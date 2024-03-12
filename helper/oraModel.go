@@ -10,21 +10,19 @@ import (
 	go_ora "github.com/sijms/go-ora/v2"
 )
 
-func OraModel() (*sql.DB, error) {
-	fmt.Println("this is ora model function")
-
+func OraModel() *sql.DB {
 	err := godotenv.Load()
 
 	if err != nil {
 		fmt.Println("Load env failed in ora model")
-		return nil, err
+		return nil
 	}
 
 	portStr := os.Getenv("port_oracle")
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
 		fmt.Println("Error converting port to integer:", err)
-		return nil, err
+		return nil
 	}
 
 	service_name := os.Getenv("service_name_oracle")
@@ -37,9 +35,9 @@ func OraModel() (*sql.DB, error) {
 
 	if err != nil {
 		fmt.Println("error connecting to oracle database : ", err)
-		return nil, err
+		return nil
 	}
 
-	fmt.Println("connection to oracle database success")
-	return conn, nil
+	fmt.Println("success connect to oracle database")
+	return conn
 }

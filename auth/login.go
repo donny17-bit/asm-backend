@@ -2,12 +2,15 @@ package auth
 
 import (
 	"asm-backend/helper"
+
 	// "asm-backend/wrapper"
 	"fmt"
-	"net/http"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
+
+var authMiddleware *jwt.GinJWTMiddleware
 
 func Login(c *gin.Context) {
 	fmt.Print("Accessing login page")
@@ -16,14 +19,7 @@ func Login(c *gin.Context) {
 		"message": "This is the login function",
 	})
 
-	db, err := helper.OraModel()
-
-	if err != nil {
-		fmt.Println("error connecting to oracle database")
-	}
-
-	fmt.Println("success connecting to oracle database")
-
+	db := helper.OraModel()
 	defer db.Close()
 
 	// Ping the database to check the connection
@@ -69,24 +65,18 @@ func PostLogin(c *gin.Context) {
 	nik := c.PostForm("nik")
 	password := c.PostForm("password")
 
-	db, err := helper.OraModel()
-
-	if err != nil {
-		fmt.Println("error occured when connecting to oracle database : ", err)
-		return
-	}
-
+	db := helper.OraModel()
 	defer db.Close()
 
 	// Execute a query
-	rows, err := db.Query("SELECT LUS_ID, NIK, PASS_ID FROM LST_USER_ASURANSI WHERE NIK = :param1 AND PASS_ID = :param2", nik, password)
+	rows, err := db.Query("SELECT NIK, PASS_ID, TRUNC(TGL_AKHIR), LDI_ID FROM LST_USER_ASURANSI WHERE NIK = :param1 AND PASS_ID = :param2", nik, password)
 
 	if err != nil {
 		fmt.Println("Error executing query:", err)
 		return
 	}
-	defer rows.Close()
 
+	defer rows.Close()
 	// Iterate through the result set
 	for rows.Next() {
 		var (
@@ -110,19 +100,29 @@ func PostLogin(c *gin.Context) {
 		return
 	}
 
-	responseData := gin.H{
-		"status": http.StatusOK,
-		"msg":    "success get data",
-		"data": []gin.H{
-			{
-				"email":    nik,
-				"password": password,
-			},
-		},
+	// cek if tgl akhir > current date
+	// later
+
+	// JWT PROCESS
+	authMiddleware, err = helper.JwtToken(nik, password)
+
+	if err != nil {
+		fmt.Println("error on jwt : ", err)
 	}
 
-	c.JSON(http.StatusOK, responseData)
+	authMiddleware.LoginHandler(c)
+	// END JWT PROCESS
+}
 
-	// wrapper nnti aja
-	// wrapper.JsonWrapper(http.StatusOK, c, responseData)
+func RefreshLogin(c *gin.Context) {
+	// JWT PROCESS
+	if authMiddleware == nil {
+		responseData := gin.H{
+			"status": "400",
+			"msg":    "token not found",
+		}
+		c.JSON(400, responseData)
+	}
+
+	authMiddleware.RefreshHandler(c)
 }
