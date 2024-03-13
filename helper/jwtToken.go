@@ -12,11 +12,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func JwtToken(nik string, password string) (*jwt.GinJWTMiddleware, error) {
+var authMiddleware *jwt.GinJWTMiddleware
+
+func JwtToken(nik string, password string, nikDb string, passwordDb string) (*jwt.GinJWTMiddleware, error) {
 
 	// JWT PROCESS
 	// the jwt middleware
 	var identityKey = "nik"
+	var err error
 
 	// User demo
 	type User struct {
@@ -24,7 +27,7 @@ func JwtToken(nik string, password string) (*jwt.GinJWTMiddleware, error) {
 	}
 
 	// initiate auth middleware
-	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
+	authMiddleware, err = jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte("secret key"),
 		Timeout:     time.Hour,
@@ -45,14 +48,11 @@ func JwtToken(nik string, password string) (*jwt.GinJWTMiddleware, error) {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			// var loginVals login
-			// if err := c.ShouldBind(&loginVals); err != nil {
-			// 	return "", jwt.ErrMissingLoginValues
-			// }
+
 			userNik := nik
 			password := password
 
-			if (userNik == "M2100591" && password == "Sukabumi7") || (userNik == "test" && password == "test") {
+			if (userNik == nikDb && password == passwordDb) || (userNik == "test" && password == "test") {
 				return &User{
 					nik: userNik,
 				}, nil
@@ -61,7 +61,7 @@ func JwtToken(nik string, password string) (*jwt.GinJWTMiddleware, error) {
 			return nil, jwt.ErrFailedAuthentication
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			if v, ok := data.(*User); ok && v.nik == "M2100591" {
+			if v, ok := data.(*User); ok && v.nik == nikDb {
 				return true
 			}
 
@@ -110,5 +110,12 @@ func JwtToken(nik string, password string) (*jwt.GinJWTMiddleware, error) {
 	return authMiddleware, nil
 
 	// END JWT PROCESS
+}
 
+// balikin ke login package
+func CurrentToken() (*jwt.GinJWTMiddleware, error) {
+	if authMiddleware == nil {
+		return nil, nil
+	}
+	return authMiddleware, nil
 }
