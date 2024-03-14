@@ -1,16 +1,17 @@
 package auth
 
 import (
-	"asm-backend/helper"
+	// "asm-backend/helper"
 
 	// "asm-backend/wrapper"
+	"asm-backend/helper"
 	"fmt"
 
-	// jwt "github.com/appleboy/gin-jwt/v2"
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
 
-// var authMiddleware *jwt.GinJWTMiddleware
+var authMiddleware *jwt.GinJWTMiddleware
 
 func Login(c *gin.Context) {
 	// Retrieve form values
@@ -57,7 +58,7 @@ func Login(c *gin.Context) {
 	// later
 
 	// JWT PROCESS
-	authMiddleware, err := helper.JwtToken(nik, password, nikDb, passwordDb)
+	authMiddleware, err = helper.JwtToken(nik, password, nikDb, passwordDb)
 
 	if err != nil {
 		fmt.Println("error on jwt : ", err)
@@ -69,8 +70,8 @@ func Login(c *gin.Context) {
 
 func RefreshLogin(c *gin.Context) {
 	// JWT PROCESS
-	authMiddleware, err := helper.CurrentToken()
-	fmt.Println(err)
+	// authMiddleware, err := helper.CurrentToken()
+	// fmt.Println(err)
 
 	if authMiddleware == nil {
 		responseData := gin.H{
@@ -85,8 +86,8 @@ func RefreshLogin(c *gin.Context) {
 
 func Logout(c *gin.Context) {
 	// JWT PROCESS
-	authMiddleware, err := helper.CurrentToken()
-	fmt.Println(err)
+	// authMiddleware, err := helper.CurrentToken()
+	// fmt.Println(err)
 
 	if authMiddleware == nil {
 		responseData := gin.H{
@@ -97,4 +98,12 @@ func Logout(c *gin.Context) {
 	}
 
 	authMiddleware.LogoutHandler(c)
+	authMiddleware = nil
+}
+
+func CurrentToken() (*jwt.GinJWTMiddleware, error) {
+	if authMiddleware == nil {
+		return nil, nil
+	}
+	return authMiddleware, nil
 }

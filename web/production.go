@@ -1,11 +1,57 @@
 package web
 
 import (
+	"asm-backend/auth"
 	"asm-backend/helper"
 	"fmt"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
+
+func ProductionAuth(router *gin.Engine) {
+	authMiddleware, err := auth.CurrentToken()
+
+	if err != nil {
+		fmt.Println("terdapat error di authMiddleware")
+		// c.JSON(200, gin.H{
+		// 	"message": "no auth middleware",
+		// })
+	}
+
+	if authMiddleware == nil {
+		fmt.Println("authMiddleware is nil")
+		return
+		// c.JSON(200, gin.H{
+		// 	"message": "no auth middleware",
+		// })
+	}
+
+	// authMiddleware.MiddlewareFunc()
+	// app := router.Group("/")
+	router.Use(authMiddleware.MiddlewareFunc())
+	{
+		router.GET("/productionAuth", func(c *gin.Context) {
+			c.JSON(200, gin.H{
+				"message": "authenticated middleware",
+			})
+		})
+	}
+
+}
+
+func HelloHandler(c *gin.Context) {
+	claims := jwt.ExtractClaims(c)
+	// fmt.Println(claims)
+	user, _ := c.Get("nik")
+
+	fmt.Println("isi user : ", user)
+	c.JSON(200, gin.H{
+		"nik": claims["nik"],
+		//   "userName": user.(*User).nik,
+		"text": "Hello World.",
+	})
+}
 
 func Production(c *gin.Context) {
 

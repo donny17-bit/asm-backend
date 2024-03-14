@@ -6,13 +6,13 @@ import (
 	"log"
 	"time"
 
-	// "net/http"
+	"net/http"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
 
-var authMiddleware *jwt.GinJWTMiddleware
+// var authMiddleware *jwt.GinJWTMiddleware
 
 func JwtToken(nik string, password string, nikDb string, passwordDb string) (*jwt.GinJWTMiddleware, error) {
 
@@ -27,12 +27,19 @@ func JwtToken(nik string, password string, nikDb string, passwordDb string) (*jw
 	}
 
 	// initiate auth middleware
-	authMiddleware, err = jwt.New(&jwt.GinJWTMiddleware{
-		Realm:       "test zone",
-		Key:         []byte("secret key"),
-		Timeout:     time.Hour,
-		MaxRefresh:  time.Hour,
-		IdentityKey: identityKey,
+	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
+		Realm:          "test zone",
+		Key:            []byte("secret key"),
+		Timeout:        time.Hour,
+		MaxRefresh:     time.Hour,
+		SendCookie:     true,
+		SecureCookie:   false, //non HTTPS dev environments
+		CookieHTTPOnly: true,  // JS can't modify
+		CookieDomain:   "127.0.0.1:8080",
+		CookieName:     "token", // default jwt
+		// TokenLookup:      "cookie:token",
+		CookieSameSite: http.SameSiteDefaultMode,
+		IdentityKey:    identityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*User); ok {
 				return jwt.MapClaims{
@@ -73,23 +80,10 @@ func JwtToken(nik string, password string, nikDb string, passwordDb string) (*jw
 				"message": message,
 			})
 		},
-		// TokenLookup is a string in the form of "<source>:<name>" that is used
-		// to extract token from the request.
-		// Optional. Default value "header:Authorization".
-		// Possible values:
-		// - "header:<name>"
-		// - "query:<name>"
-		// - "cookie:<name>"
-		// - "param:<name>"
-		TokenLookup: "header: Authorization, query: token, cookie: jwt",
-		// TokenLookup: "query:token",
-		// TokenLookup: "cookie:token",
 
-		// TokenHeadName is a string in the header. Default value is "Bearer"
+		TokenLookup:   "header: Authorization, query: token, cookie: token",
 		TokenHeadName: "Bearer",
-
-		// TimeFunc provides the current time. You can override it to use another time value. This is useful for testing or if your server uses a different time zone than your tokens.
-		TimeFunc: time.Now,
+		TimeFunc:      time.Now,
 	})
 
 	if err != nil {
@@ -113,9 +107,9 @@ func JwtToken(nik string, password string, nikDb string, passwordDb string) (*jw
 }
 
 // balikin ke login package
-func CurrentToken() (*jwt.GinJWTMiddleware, error) {
-	if authMiddleware == nil {
-		return nil, nil
-	}
-	return authMiddleware, nil
-}
+// func CurrentToken() (*jwt.GinJWTMiddleware, error) {
+// 	if authMiddleware == nil {
+// 		return nil, nil
+// 	}
+// 	return authMiddleware, nil
+// }
