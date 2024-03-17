@@ -91,3 +91,45 @@ func LogoutSession(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Logout successful"})
 }
+
+func IsActive(c *gin.Context) bool {
+	session := sessions.Default(c)
+
+	nik := session.Get("nik")
+	lastActivity := session.Get("lastActivity")
+
+	if nik == nil || lastActivity == nil {
+		// c.JSON(http.StatusUnauthorized, gin.H{
+		// 	"nik":          nik,
+		// 	"lastActivity": lastActivity,
+		// 	"text":         "unauthorized",
+		// })
+		return false
+	}
+
+	// Check if session is still active
+	if time.Now().Unix()-lastActivity.(int64) > 1800 { // 30 minutes
+		session.Options(sessions.Options{
+			MaxAge: 0, // 0 minutes
+		})
+		session.Save()
+		session.Clear()
+		session.Save()
+		// c.JSON(http.StatusUnauthorized, gin.H{"message": "Session expired"})
+		return false
+	}
+
+	// Update last activity
+	session.Set("lastActivity", time.Now().Unix())
+	session.Options(sessions.Options{
+		MaxAge: 1800, // 30 minutes
+	})
+	session.Save()
+
+	// c.JSON(200, gin.H{
+	// 	"nik":          nik,
+	// 	"lastActivity": lastActivity,
+	// 	"text":         "authorized",
+	// })
+	return true
+}

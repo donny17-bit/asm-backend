@@ -62,8 +62,9 @@ func main() {
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("session", store))
 
-	router.GET("/api/production-session", web.HelloHandlerSession)
+	router.GET("/api/production-session", web.Production)
 
+	// auth
 	router.POST("/api/login-session", auth.LoginSession)
 	router.GET("/api/logout-session", auth.LogoutSession)
 

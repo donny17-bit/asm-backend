@@ -1,64 +1,24 @@
 package web
 
 import (
-	// "asm-backend/auth_temp"
+	"asm-backend/auth"
 	"asm-backend/model"
 	"fmt"
 	"net/http"
-	"time"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-func HelloHandlerSession(c *gin.Context) {
-	session := sessions.Default(c)
-
-	nik := session.Get("nik")
-	lastActivity := session.Get("lastActivity")
-
-	if nik == nil || lastActivity == nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"nik":          nik,
-			"lastActivity": lastActivity,
-			"text":         "unauthorized",
-		})
-		return
-	}
-
-	fmt.Println("current time - last activity", time.Now().Unix()-lastActivity.(int64))
-
-	// Check if session is still active
-	if time.Now().Unix()-lastActivity.(int64) > 1800 { // 30 minutes
-		session.Options(sessions.Options{
-			MaxAge: 0, // 0 minutes
-		})
-		session.Save()
-		session.Clear()
-		session.Save()
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Session expired"})
-		return
-	}
-
-	// Update last activity
-	session.Set("lastActivity", time.Now().Unix())
-	session.Options(sessions.Options{
-		MaxAge: 1800, // 30 minutes
-	})
-	session.Save()
-
-	c.JSON(200, gin.H{
-		"nik":          nik,
-		"lastActivity": lastActivity,
-		"text":         "authorized",
-	})
-}
-
 func Production(c *gin.Context) {
 
-	c.JSON(200, gin.H{
-		"message": "This is the production function",
-	})
+	ok := auth.IsActive(c)
+
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
 
 	db, err := model.SqlModel()
 
@@ -66,9 +26,6 @@ func Production(c *gin.Context) {
 		fmt.Println("error to connect to database")
 		return
 	}
-
-	fmt.Println("connected to sql database")
-
 	defer db.Close()
 
 	// Perform a query
@@ -82,24 +39,42 @@ func Production(c *gin.Context) {
 
 	defer rows.Close() // Close the result set when done
 
+	type Data struct {
+		No_polis string `json:"no_polis"`
+		Tgl_prod string `json:"tgl_prod"`
+		Prod_ke  string `json:"prod_ke"`
+	}
+
+	// Create an array to store the query results
+	var datas []Data
+
 	for rows.Next() {
-		var (
-			column1 string
-			column2 string
-			column3 string
-		)
-		err := rows.Scan(&column1, &column2, &column3)
-		if err != nil {
-			fmt.Println("Error scanning row:", err)
+		var data Data
+
+		// Scan each row into a struct
+		if err := rows.Scan(&data.No_polis, &data.Tgl_prod, &data.Prod_ke); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		// err := rows.Scan(&no_polis, &tgl_prod, &prod_ke)
+		// if err != nil {
+		// 	fmt.Println("Error scanning row:", err)
+		// 	return
+		// }
 
-		// Do something with the row data
-		fmt.Println(column1, column2, column3)
+		// Append the struct to the array
+		datas = append(datas, data)
 	}
 
 	if err := rows.Err(); err != nil {
 		fmt.Println("Error iterating rows:", err)
 		return
 	}
+
+	// if no error
+	// Respond with JSON data
+	c.JSON(http.StatusOK, gin.H{
+		"status": 200,
+		"data":   datas,
+	})
 }
