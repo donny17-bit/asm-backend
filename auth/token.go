@@ -1,4 +1,4 @@
-package auth_token
+package auth
 
 import (
 	// "asm-backend/helper"
@@ -100,7 +100,7 @@ func Token() (*jwt.GinJWTMiddleware, error) {
 
 func AuthenticatorHandler(c *gin.Context) (interface{}, error) {
 	// loginData := auth.LoginHandler(c)
-	loginData := LoginHandler(c)
+	loginData := Login(c)
 
 	nik := loginData.nik
 	password := loginData.password
@@ -127,18 +127,15 @@ func AuthenticatorHandler(c *gin.Context) (interface{}, error) {
 }
 
 func AuthorizatorHandler(data interface{}, c *gin.Context) bool {
-	loginData := LoginHandler(c)
+	// loginData := Login(c)
+
 	// get the cookie
-	cookieNik := c.MustGet("nik").(string)
-	fmt.Println("cookie value : ", cookieNik)
+	cookieNik, err := c.Cookie("nik")
+	fmt.Println("cookie value nik : ", cookieNik)
+	fmt.Println("err : ", err)
 
 	v, ok := data.(*User)
-	fmt.Println(v)
-	fmt.Println(ok)
-	nikDb := loginData.nikDb
-	fmt.Println("login data : ", loginData)
-	fmt.Println("nik v : ", v.Nik)
-	fmt.Println("nik DB : ", nikDb)
+	nikDb := cookieNik
 
 	if ok && v.Nik == nikDb || (v.Nik == "test") {
 		fmt.Println(data)
@@ -146,6 +143,8 @@ func AuthorizatorHandler(data interface{}, c *gin.Context) bool {
 		return true
 	}
 
+	// kasih pengecekkan dengan cabang user, divisi user, dan departement user
+	// later
+
 	return false
-	// return false
 }

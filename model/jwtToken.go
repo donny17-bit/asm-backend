@@ -1,4 +1,7 @@
-package helper
+package model
+
+// ga kepake
+// nnti dihapus
 
 import (
 	// "asm-backend/helper"

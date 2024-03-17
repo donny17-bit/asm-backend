@@ -1,8 +1,8 @@
 package web
 
 import (
-	"asm-backend/auth"
-	"asm-backend/helper"
+	"asm-backend/auth_temp"
+	"asm-backend/model"
 	"fmt"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -10,7 +10,7 @@ import (
 )
 
 func ProductionAuth(router *gin.Engine) {
-	authMiddleware, err := auth.CurrentToken()
+	authMiddleware, err := auth_temp.CurrentToken()
 
 	if err != nil {
 		fmt.Println("terdapat error di authMiddleware")
@@ -43,12 +43,13 @@ func ProductionAuth(router *gin.Engine) {
 func HelloHandler(c *gin.Context) {
 	claims := jwt.ExtractClaims(c)
 	// fmt.Println(claims)
-	user, _ := c.Get("nik")
+	// user, _ := c.Get("nik")
+	// user := c.MustGet("nik") // .Get("nik")
 
-	fmt.Println("isi user : ", user)
+	// fmt.Println("isi user : ", user)
 	c.JSON(200, gin.H{
 		"nik": claims["nik"],
-		//   "userName": user.(*User).nik,
+		// "userName": user.(*User).nik,
 		"text": "Hello World.",
 	})
 }
@@ -59,7 +60,7 @@ func Production(c *gin.Context) {
 		"message": "This is the production function",
 	})
 
-	db, err := helper.SqlModel()
+	db, err := model.SqlModel()
 
 	if err != nil {
 		fmt.Println("error to connect to database")

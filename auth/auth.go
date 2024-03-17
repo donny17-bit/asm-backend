@@ -1,25 +1,33 @@
 package auth
 
 import (
-	// "asm-backend/helper"
-
-	// "asm-backend/wrapper"
-	"asm-backend/helper"
+	"asm-backend/model"
 	"fmt"
+	"net/http"
+	"time"
 
-	jwt "github.com/appleboy/gin-jwt/v2"
+	// jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
+	// "github.com/gorilla/sessions"
 )
 
-var authMiddleware *jwt.GinJWTMiddleware
+type loginData struct {
+	nik        string
+	password   string
+	nikDb      string
+	passwordDb string
+}
 
-func Login(c *gin.Context) {
+func Login(c *gin.Context) loginData {
 	// Retrieve form values
 	// case sensitive!!!!
 	nik := c.PostForm("nik")
 	password := c.PostForm("password")
 
-	db := helper.OraModel()
+	fmt.Println("nik : ", nik)
+	fmt.Println("password : ", password)
+
+	db := model.OraModel()
 	defer db.Close()
 
 	// Execute a query
@@ -27,7 +35,7 @@ func Login(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println("Error executing query:", err)
-		return
+		return loginData{}
 	}
 
 	defer rows.Close()
@@ -42,7 +50,7 @@ func Login(c *gin.Context) {
 	for rows.Next() {
 		if err := rows.Scan(&nikDb, &passwordDb, &tgl_akhir, &ldi_id); err != nil {
 			fmt.Println("Error scanning row:", err)
-			return
+			return loginData{}
 		}
 
 		// Do something with the row data
@@ -51,32 +59,29 @@ func Login(c *gin.Context) {
 
 	if err := rows.Err(); err != nil {
 		fmt.Println("Error iterating rows:", err)
-		return
+		return loginData{}
 	}
+
+	login := loginData{}
+	login.nik = nik
+	login.password = password
+	login.nikDb = nikDb
+	login.passwordDb = passwordDb
+
+	return login
 
 	// cek if tgl akhir > current date
 	// later
-
-	// JWT PROCESS
-	authMiddleware, err = helper.JwtToken(nik, password, nikDb, passwordDb)
-
-	if err != nil {
-		fmt.Println("error on jwt : ", err)
-	}
-
-	authMiddleware.LoginHandler(c)
-	// END JWT PROCESS
 }
 
-func RefreshLogin(c *gin.Context) {
-	// JWT PROCESS
-	// authMiddleware, err := helper.CurrentToken()
-	// fmt.Println(err)
+func RefreshToken(c *gin.Context) {
+	authMiddleware, err := Token()
 
-	if authMiddleware == nil {
+	if err != nil || authMiddleware == nil {
 		responseData := gin.H{
 			"status": "400",
 			"msg":    "token not found",
+			"error":  err,
 		}
 		c.JSON(400, responseData)
 	}
@@ -85,25 +90,25 @@ func RefreshLogin(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-	// JWT PROCESS
-	// authMiddleware, err := helper.CurrentToken()
-	// fmt.Println(err)
+	authMiddleware, err := Token()
 
-	if authMiddleware == nil {
+	if err != nil || authMiddleware == nil {
 		responseData := gin.H{
 			"status": "400",
 			"msg":    "token not found",
+			"error":  err,
 		}
 		c.JSON(400, responseData)
 	}
 
-	authMiddleware.LogoutHandler(c)
-	authMiddleware = nil
-}
-
-func CurrentToken() (*jwt.GinJWTMiddleware, error) {
-	if authMiddleware == nil {
-		return nil, nil
+	cookie := http.Cookie{
+		Name:     "nik",
+		Value:    "",
+		Expires:  time.Now(),
+		HttpOnly: true,
 	}
-	return authMiddleware, nil
+
+	c.SetCookie("nik", cookie.Value, 0, cookie.Path, cookie.Domain, cookie.Secure, cookie.HttpOnly)
+
+	authMiddleware.LogoutHandler(c)
 }
