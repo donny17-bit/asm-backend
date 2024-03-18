@@ -6,6 +6,7 @@ import (
 	"asm-backend/auth"
 	"asm-backend/web"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/gin-contrib/sessions"
@@ -62,6 +63,15 @@ func main() {
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("session", store))
 
+	// main route
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"code":    200,
+			"message": "base route",
+		})
+	})
+
+	// production
 	router.GET("/api/production-session", web.Production)
 
 	// auth
