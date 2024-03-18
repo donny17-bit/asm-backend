@@ -56,11 +56,6 @@ func Production(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		// err := rows.Scan(&no_polis, &tgl_prod, &prod_ke)
-		// if err != nil {
-		// 	fmt.Println("Error scanning row:", err)
-		// 	return
-		// }
 
 		// Append the struct to the array
 		datas = append(datas, data)
