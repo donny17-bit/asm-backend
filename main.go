@@ -72,11 +72,12 @@ func main() {
 	})
 
 	// production
-	router.GET("/api/production-session", web.Production)
+	router.GET("/api/production-longterm", web.ProductionLt)
+	router.GET("/api/production-yearly", web.ProductionYr)
 
 	// auth
-	router.POST("/api/login-session", auth.LoginSession)
-	router.GET("/api/logout-session", auth.LogoutSession)
+	router.POST("/api/login", auth.LoginSession)
+	router.GET("/api/logout", auth.LogoutSession)
 
 	port := os.Getenv("PORT")
 	fmt.Print("you are using port : ", port)
