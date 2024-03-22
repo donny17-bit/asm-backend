@@ -34,7 +34,7 @@ func LoginSession(c *gin.Context) {
 	defer db.Close()
 
 	// Execute a query
-	query := "SELECT NIK, PASS_ID, TRUNC(TGL_AKHIR), LDI_ID, CAB_ID FROM LST_USER_ASURANSI WHERE NIK = :param1 AND PASS_ID = :param2"
+	query := "SELECT NIK, PASS_ID, TRUNC(TGL_AKHIR), LDI_ID, CAB_ID FROM LST_USER_ASURANSI WHERE NIK = :param1 AND PASS_ID = :param2 AND STS_AKTIF = '1'"
 	rows, err := db.Query(query, nik, password)
 
 	if err != nil {
@@ -99,11 +99,15 @@ func LoginSession(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  200,
 			"nik":     nik,
+			"cabang":  cab_id,
+			"divisi":  ldi_id,
 			"message": "Login successful"})
 	} else {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  401,
 			"nik":     nik,
+			"cabang":  cab_id,
+			"divisi":  ldi_id,
 			"message": "Login failed"})
 	}
 }
@@ -218,3 +222,75 @@ func IsActive(c *gin.Context) bool {
 
 	return true
 }
+
+// lanjut nnti dlu
+// func getUserDivision(c *gin.Context) {
+// 	nik := c.PostForm("nik")
+// 	password := c.PostForm("password")
+
+// 	fmt.Println("nik : ", nik)
+// 	fmt.Println("password : ", password)
+
+// 	// check is user already login
+// 	// ok := IsActive(c)
+
+// 	// if ok {
+// 	// 	c.JSON(http.StatusUnauthorized, gin.H{
+// 	// 		"status":  200,
+// 	// 		"nik":     nik,
+// 	// 		"message": "user already login",
+// 	// 	})
+// 	// 	return
+// 	// }
+// 	// skip dlu
+
+// 	db := model.OraModel()
+// 	defer db.Close()
+
+// 	// Execute a query
+// 	query := "SELECT NIK, PASS_ID, TRUNC(TGL_AKHIR), LDI_ID, CAB_ID FROM LST_USER_ASURANSI WHERE NIK = :param1 AND PASS_ID = :param2 AND STS_AKTIF = '1'"
+// 	rows, err := db.Query(query, nik, password)
+
+// 	if err != nil {
+// 		fmt.Println("Error executing query:", err)
+// 		return
+// 	}
+
+// 	// Iterate through the result set
+// 	type Data struct {
+// 		Nik        string  `json:"Nik"`
+// 		BranchId      string  `json:"CabangId"`
+// 		Branch string  `json:"Branch"`
+// 		DivisionId       string  `json:DivisionId"`
+// 		Division            string  `json:"Division"`
+// 	}
+
+// 	for rows.Next() {
+// 		if err := rows.Scan(&nikDb, &passwordDb, &tgl_akhir, &ldi_id, &cab_id); err != nil {
+// 			fmt.Println("Error scanning row:", err)
+// 			return
+// 		}
+// 	}
+
+// 	if err := rows.Err(); err != nil {
+// 		fmt.Println("Error iterating rows:", err)
+// 		return
+// 	}
+
+// 	if nik == nikDb && password == passwordDb || nik == "test" {
+// 		c.JSON(http.StatusOK, gin.H{
+// 			"status":  200,
+// 			"nik":     nik,
+// 			"cabang":  cab_id,
+// 			// "cabang":
+// 			"divisi":  ldi_id,
+// 			"message": "get division sucess"})
+// 	} else {
+// 		c.JSON(http.StatusUnauthorized, gin.H{
+// 			"status":  401,
+// 			"nik":     nik,
+// 			"cabang":  cab_id,
+// 			"divisi":  ldi_id,
+// 			"message": " failed"})
+// 	}
+// }

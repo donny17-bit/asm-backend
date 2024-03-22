@@ -72,11 +72,12 @@ func main() {
 	})
 
 	// production
-	router.GET("/api/production-longterm", web.ProductionLt)
+	router.GET("/api/production-longterm", web.GetProductionLt)
 	router.GET("/api/production-yearly", web.ProductionYr)
 
 	// auth
 	router.POST("/api/login", auth.LoginSession)
+	router.POST("/api/user-division", auth.LoginSession) // blm dipake
 	router.GET("/api/logout", auth.LogoutSession)
 
 	port := os.Getenv("PORT")
