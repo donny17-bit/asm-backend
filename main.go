@@ -75,6 +75,12 @@ func main() {
 	router.GET("/api/production-longterm", web.GetProductionLt)
 	router.GET("/api/production-yearly", web.ProductionYr)
 
+	// master
+	router.GET("/api/branch", web.GetBranch)
+	router.GET("/api/business", web.GetBusiness)
+	router.GET("/api/group-business", web.GetGrpBusiness)
+	router.GET("/api/business-source", web.GetBusinessSource)
+
 	// auth
 	router.POST("/api/login", auth.LoginSession)
 	router.POST("/api/user-division", auth.LoginSession) // blm dipake

@@ -12,17 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// NewNullableString creates a new NullableString with the given value.
-// func NewNullableString(value sql.NullString) NullableString {
-// 	if value.Valid {
-// 		return NullableString{
-// 			Value: value.String,
-// 			Valid: true,
-// 		}
-// 	}
-// 	return NullableString{}
-// }
-
 func GetProductionLt(c *gin.Context) {
 
 	ok := auth.IsActive(c)
@@ -246,17 +235,6 @@ func GetProductionLt(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			// fmt.Println("Error scanning row:", err)
 		}
-
-		// Populate nullable date field
-		// if JenisPaketSql.Valid {
-		// 	data.JenisPaket.Value = JenisPaketSql.String
-		// 	data.JenisPaket.Valid = true
-		// }
-
-		// if NamaCedingSql.Valid {
-		// 	data.NamaCeding.Value = NamaCedingSql.String
-		// 	data.NamaCeding.Valid = true
-		// }
 
 		// Append the struct to the array
 		datas = append(datas, data)
