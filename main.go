@@ -52,7 +52,7 @@ import (
 // use session
 func main() {
 	router := gin.Default()
-
+	router.Use(CORS())
 	err := godotenv.Load()
 
 	if err != nil {
@@ -82,11 +82,33 @@ func main() {
 	router.GET("/api/business-source", web.GetBusinessSource)
 
 	// auth
-	router.POST("/api/login", auth.LoginSession)
-	router.POST("/api/user-division", auth.LoginSession) // blm dipake
-	router.GET("/api/logout", auth.LogoutSession)
+	router.POST("/api/login", auth.LoginSessionSql)
+	// router.POST("/api/user-division", auth.LoginSession) // blm dipake
+	router.GET("/api/logout", auth.LogoutSessionSql)
 
 	port := os.Getenv("PORT")
 	fmt.Print("you are using port : ", port)
 	router.Run(":" + port)
+}
+
+
+
+func CORS() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Signature, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+		c.Writer.Header().Set("Content-Type", "application/json")
+		c.Writer.Header().Set("X-Content-Type-Options", "nosniff")
+		c.Writer.Header().Set("X-Frame-Options", "SAMEORIGIN")
+		c.Writer.Header().Set("X-XSS-Protection", "1; mode=block")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
 }

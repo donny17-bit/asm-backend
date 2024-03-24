@@ -27,6 +27,7 @@ func SqlModel() (*sql.DB, error) {
 
 	query := url.Values{}
 	query.Add("database", database)
+	query.Add("encrypt", "disable")
 
 	u := &url.URL{
 		Scheme:   "sqlserver",
