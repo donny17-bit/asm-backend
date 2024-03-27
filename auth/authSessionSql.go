@@ -193,7 +193,7 @@ func IsActiveSql(c *gin.Context) bool {
 	expiration := session.Get("expiration")
 
 	fmt.Println("nik in is active : ", nik)
-	fmt.Println("password : ", id)
+	fmt.Println("id session : ", id)
 
 	if id == nil || nik == nil || lastActivity == nil || expiration == nil {
 		return false
