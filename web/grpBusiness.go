@@ -1,7 +1,6 @@
 package web
 
 import (
-	"asm-backend/auth"
 	"fmt"
 	"net/http"
 
@@ -12,19 +11,19 @@ import (
 
 func GetGrpBusiness(c *gin.Context) {
 
-	ok := auth.IsActive(c)
+	// ok := auth.IsActive(c)
 
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"data":           "",
-			"current_page: ": "",
-			"page_size":      "",
-			"max_page":       "",
-			"message":        "unauthorized",
-			"status":         401,
-		})
-		return
-	}
+	// if !ok {
+	// 	c.JSON(http.StatusUnauthorized, gin.H{
+	// 		"data":           "",
+	// 		"current_page: ": "",
+	// 		"page_size":      "",
+	// 		"max_page":       "",
+	// 		"message":        "unauthorized",
+	// 		"status":         401,
+	// 	})
+	// 	return
+	// }
 
 	db, err := model.SqlModel()
 

@@ -50,7 +50,7 @@ func LoginSessionSql(c *gin.Context) {
 	ok := IsActiveSql(c)
 
 	if ok {
-		c.JSON(http.StatusUnauthorized, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"status":  200,
 			"nik":     nik,
 			"message": "user already login",
@@ -121,6 +121,7 @@ func LoginSessionSql(c *gin.Context) {
 		session.Set("expiration", expiration.Unix())
 		session.Options(sessions.Options{
 			MaxAge: 1800, // 30 minutes
+			// HttpOnly: true,
 		})
 		session.Save()
 
@@ -135,6 +136,10 @@ func LoginSessionSql(c *gin.Context) {
 			fmt.Println("Error executing query:", err)
 			return
 		}
+
+		// Set session data as a cookie in the HTTP response
+		// c.SetCookie("session", id, 1800, "/", "", false, false) // SetCookie(name, value, maxAge, path, domain, secure, httpOnly)
+
 
 		c.JSON(http.StatusOK, gin.H{
 			"status":  200,
