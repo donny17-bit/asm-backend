@@ -13,35 +13,35 @@ import (
 
 func LoginSessionSql(c *gin.Context) {
 	// work on next js
-	// var data map[string]interface{}
+	var data map[string]interface{}
 
-    // err := c.BindJSON(&data)
-    // if err != nil {
-    //     // Handle error
-    //     return
-    // }
+    err := c.BindJSON(&data)
+    if err != nil {
+        // Handle error
+        return
+    }
 
-	// // Now you can access the fields from the JSON data
-    // nik, okNik := data["nik"].(string)
-    // if !okNik {
-    //     // "nik" field not found or not a string
-    //     // Handle error
-	// 	fmt.Println("nik not found in request body")
-    //     return
-    // }
+	// Now you can access the fields from the JSON data
+    nik, okNik := data["nik"].(string)
+    if !okNik {
+        // "nik" field not found or not a string
+        // Handle error
+		fmt.Println("nik not found in request body")
+        return
+    }
 
-	// password, okPass := data["password"].(string)
-    // if !okPass {
-    //     // "nik" field not found or not a string
-    //     // Handle error
-	// 	fmt.Println("password not found in request body")
-    //     return
-    // }
+	password, okPass := data["password"].(string)
+    if !okPass {
+        // "nik" field not found or not a string
+        // Handle error
+		fmt.Println("password not found in request body")
+        return
+    }
 
 
 	// work on postman
-	nik := c.PostForm("nik")
-	password := c.PostForm("password")
+	// nik := c.PostForm("nik")
+	// password := c.PostForm("password")
 
 	fmt.Println("nik : ", nik)
 	fmt.Println("password : ", password)
