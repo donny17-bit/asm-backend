@@ -14,7 +14,7 @@ import (
 
 func GetProductionLt(c *gin.Context) {
 
-	ok := auth.IsActive(c)
+	ok := auth.IsActiveSql(c) // nnti diganti isActive
 
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -36,11 +36,22 @@ func GetProductionLt(c *gin.Context) {
 		return
 	}
 
+	// cek jika ldc_id ada di request
+	var ldc_id_param string
+
+	if c.Query("ldc_id") == "" {
+		ldc_id_param = ldc_id.(string)
+	} else {
+		ldc_id_param = c.Query("ldc_id")
+	}
+
 	page := c.Query("page")
 	pageSize := c.Query("page_size")
 	sort := c.Query("sort")
 	order := c.Query("order")
 	noPolis := c.Query("no_polis")
+	beginDate := c.Query("begin_date")
+	endDate := c.Query("end_date")
 
 	if sort == "" {
 		sort = "asc"
@@ -56,8 +67,8 @@ func GetProductionLt(c *gin.Context) {
 
 	// cek total row ------------------
 	var queryRow string
-	queryTotalRow := "select count(1) as total_rows FROM Warehouse_Asm.dbo.PRODUCTION_GABUNGAN_VIEW A JOIN Warehouse_Asm.dbo.MV_AGEN MA ON A.LAG_ID = MA.LAG_AGEN_ID JOIN Warehouse_Asm.dbo.LST_CABANG LC ON A.LDC_ID = LC.LDC_ID JOIN Warehouse_Asm.dbo.LST_BUSINESS LB ON A.LBU_ID = LB.LBU_ID JOIN Warehouse_Asm.dbo.LST_GRP_BUSINESS LGB ON LB.LGB_ID = LGB.LGB_ID JOIN Warehouse_Asm.dbo.LST_JN_PRODUKSI LJP ON LJP.LJP_ID = A.LJP_ID JOIN Warehouse_Asm.dbo.JNNER JNN ON JNN.JN_NER = A.JN_NER LEFT OUTER JOIN Warehouse_Asm.dbo.LST_MO MO ON A.LMO_ID = MO.LMO_ID LEFT OUTER JOIN Warehouse_Asm.dbo.MST_CLIENT MC ON A.CLIENT_ID = MC.MCL_ID LEFT OUTER JOIN Warehouse_Asm.dbo.LST_JENIS_COAS JN_COAS ON A.MDS_JN_COAS = JN_COAS.MDS_JN_COAS "
-	whereRow := "where a.ldc_id = '" + ldc_id.(string) + "' "
+	queryTotalRow := "select count(1) as total_rows FROM PRODUCTION_GABUNGAN_VIEW A JOIN MV_AGEN MA ON A.LAG_ID = MA.LAG_AGEN_ID JOIN LST_CABANG LC ON A.LDC_ID = LC.LDC_ID JOIN LST_BUSINESS LB ON A.LBU_ID = LB.LBU_ID JOIN LST_GRP_BUSINESS LGB ON LB.LGB_ID = LGB.LGB_ID JOIN LST_JN_PRODUKSI LJP ON LJP.LJP_ID = A.LJP_ID JOIN JNNER JNN ON JNN.JN_NER = A.JN_NER LEFT OUTER JOIN LST_MO MO ON A.LMO_ID = MO.LMO_ID LEFT OUTER JOIN MST_CLIENT MC ON A.CLIENT_ID = MC.MCL_ID LEFT OUTER JOIN LST_JENIS_COAS JN_COAS ON A.MDS_JN_COAS = JN_COAS.MDS_JN_COAS "
+	whereRow := "where a.ldc_id = '" + ldc_id_param + "' and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between '"+beginDate+"' and '"+endDate+"'"
 
 	if noPolis != "" {
 		andPolis := " and no_polis in ('" + noPolis + "','')"
@@ -105,18 +116,20 @@ func GetProductionLt(c *gin.Context) {
 
 	// get query
 	var queryFinal string
-	query := "exec Warehouse_Asm.dbo.SP_DETAIL_PRODUCTION_LONGTERM " + " "
+	query := "exec Warehouse_Asm_spk.dbo.SP_DETAIL_PRODUCTION_LONGTERM " + " "
 	// nnti tambahin get all rows
-	where := "'" + order + "', '" + sort + "', '" + page + "', '" + pageSize + "', 'where a.ldc_id = ''" + ldc_id.(string) + "'"
+	where := "'" + order + "', '" + sort + "', '" + page + "', '" + pageSize + "', 'where a.ldc_id = ''" + ldc_id_param + "''" + " " +
+			"and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between ''"+beginDate+"'' and ''"+endDate+"'' "
 
 	if noPolis != "" {
-		andPolis := "' and no_polis in (''" + noPolis + "'','''')'"
+		andPolis := " and no_polis in (''" + noPolis + "'','''')'"
 		queryFinal = query + where + andPolis
 	} else {
-		andPolis := "''"
+		andPolis := "'"
 		queryFinal = query + where + andPolis
 	}
 
+	fmt.Println(queryFinal)
 	// nnti tambhain klau yg login nik itasm, keluarin semua
 	rows, err := db.Query(queryFinal)
 
@@ -151,7 +164,7 @@ func GetProductionLt(c *gin.Context) {
 		JenisProd     string  `json:"JenisProd"`
 		JenisPaket    *string `json:"JenisPaket"`
 		// JenisPaket    NullableString `json:"JenisPaket"`
-		Ket string `json:"Ket"`
+		Ket *string `json:"Ket"`
 		// NamaCeding    NullableString `json:"NamaCeding"`
 		NamaCeding    *string `json:"NamaCeding"`
 		Namaleader0   string  `json:"Namaleader0"`
