@@ -109,6 +109,7 @@ func LoginSessionSql(c *gin.Context) {
 		lastActivity := time.Now()
 		lastActivityString := lastActivity.String()
 		expiration := time.Now().Add(30 * time.Minute)
+		// expiration := time.Now().Add(1 * time.Minute) // for testing
 		expirationString := expiration.String()
 
 		// lastActivityTimestamp := lastActivity.Format(oracleTimestampFormat)
@@ -121,6 +122,8 @@ func LoginSessionSql(c *gin.Context) {
 		session.Set("expiration", expiration.Unix())
 		session.Options(sessions.Options{
 			MaxAge: 1800, // 30 minutes
+			// MaxAge: 60, // for testing
+			
 			// HttpOnly: true,
 		})
 		session.Save()
@@ -174,11 +177,11 @@ func LogoutSessionSql(c *gin.Context) {
 	session.Options(sessions.Options{
 		MaxAge: 0, // 0 minutes
 	})
-	session.Save()
 	session.Clear()
+	session.Save()
 
 	// Save the session
-	session.Save()
+	// session.Save()
 
 	c.JSON(http.StatusOK, gin.H{"status": 200,
 		"message": "Logout successful"})
@@ -250,6 +253,10 @@ func IsActiveSql(c *gin.Context) bool {
 	lastActivityNew := time.Now()
 	lastActivityString := lastActivityNew.String()
 	expirationNew := time.Now().Add(30 * time.Minute)
+	
+	// for testing only
+	// expirationNew := time.Now().Add(1 * time.Minute)
+
 	expirationString := expirationNew.String()
 
 	
@@ -259,6 +266,7 @@ func IsActiveSql(c *gin.Context) bool {
 	session.Set("expiration", expirationNew.Unix())
 	session.Options(sessions.Options{
 		MaxAge: 1800, // 30 minutes
+		// MaxAge: 60, // for testing only
 	})
 	session.Save()
 
