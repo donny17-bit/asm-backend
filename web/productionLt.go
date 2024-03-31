@@ -258,14 +258,26 @@ func GetProductionLt(c *gin.Context) {
 		return
 	}
 
+	pageNum, err := strconv.Atoi(page)
+	if err != nil {
+        // Handle error
+        fmt.Println("Error converting page to number:", err)
+        return
+    }
+	nextPage := pageNum+1
+	previousPage := pageNum-1
+
 	// if no error
 	// Respond with JSON data
 	c.JSON(http.StatusOK, gin.H{
 		"status":       200,
 		"data":         datas,
 		"current_page": page,
+		"next_page": nextPage,
+		"previous_page": previousPage,
 		"max_page":     totalPage,
 		"page_size":    pageSize,
+		"total_data": totalRows,
 		"message":      "success get data",
 	})
 }
