@@ -1,8 +1,6 @@
 package main
 
 import (
-	// "asm-backend/auth"
-	// "asm-backend/web"
 	"asm-backend/auth"
 	"asm-backend/web"
 	"fmt"
@@ -14,40 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
-
-// use jwt token
-// func main() {
-// 	router := gin.Default()
-
-// 	err := godotenv.Load()
-
-// 	if err != nil {
-// 		fmt.Print("Load env failed")
-// 		return
-// 	}
-
-// 	authMiddleware, err := auth.Token()
-
-// 	if err != nil {
-// 		fmt.Println("err : ", err)
-// 		return
-// 	}
-
-// 	router.GET("/api/refresh", auth.RefreshToken)
-// 	router.GET("/api/logout", auth.Logout)
-// 	router.POST("/api/login", authMiddleware.LoginHandler)
-
-// 	auth := router.Group("/auth")
-// 	auth.Use(authMiddleware.MiddlewareFunc())
-// 	{
-// 		auth.GET("/production", web.Production)
-// 		auth.GET("/hello", web.HelloHandler)
-// 	}
-
-// 	port := os.Getenv("PORT")
-// 	fmt.Print("you are using port : ", port)
-// 	router.Run(":" + port)
-// }
 
 // use session
 func main() {
@@ -82,7 +46,8 @@ func main() {
 	router.GET("/api/business-source", web.GetBusinessSource)
 
 	// auth
-	router.POST("/api/login", auth.LoginSessionSql)
+	// router.POST("/api/login", auth.LoginSessionSql)
+	router.POST("/api/login", auth.LoginSession)
 	// router.POST("/api/user-division", auth.LoginSession) // blm dipake
 	router.GET("/api/logout", auth.LogoutSessionSql)
 
@@ -90,8 +55,6 @@ func main() {
 	fmt.Print("you are using port : ", port)
 	router.Run(":" + port)
 }
-
-
 
 func CORS() gin.HandlerFunc {
 	return func(c *gin.Context) {

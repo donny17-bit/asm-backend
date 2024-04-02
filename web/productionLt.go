@@ -6,15 +6,33 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func GetProductionLt(c *gin.Context) {
+	err := godotenv.Load()
 
-	ok := auth.IsActiveSql(c) // nnti diganti isActive
+	if err != nil {
+		fmt.Print("Load env failed")
+		return
+	}
+
+	auth_server := os.Getenv("auth_server")
+
+	var ok bool
+
+	if auth_server == "oracle" {
+		ok = auth.IsActive(c)
+	}
+
+	if auth_server == "sql" {
+		ok = auth.IsActiveSql(c)
+	}
 
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -45,13 +63,14 @@ func GetProductionLt(c *gin.Context) {
 		ldc_id_param = c.Query("ldc_id")
 	}
 
-	page := c.Query("page")
-	pageSize := c.Query("page_size")
-	sort := c.Query("sort")
-	order := c.Query("order")
+	page := c.Query("page")          // req
+	pageSize := c.Query("page_size") // req
+	sort := c.Query("sort")          // opt
+	order := c.Query("order")        // req
 	noPolis := c.Query("no_polis")
 	beginDate := c.Query("begin_date")
 	endDate := c.Query("end_date")
+	business := c.Query("business")
 
 	if sort == "" {
 		sort = "asc"
@@ -68,13 +87,34 @@ func GetProductionLt(c *gin.Context) {
 	// cek total row ------------------
 	var queryRow string
 	queryTotalRow := "select count(1) as total_rows FROM PRODUCTION_GABUNGAN_VIEW A JOIN MV_AGEN MA ON A.LAG_ID = MA.LAG_AGEN_ID JOIN LST_CABANG LC ON A.LDC_ID = LC.LDC_ID JOIN LST_BUSINESS LB ON A.LBU_ID = LB.LBU_ID JOIN LST_GRP_BUSINESS LGB ON LB.LGB_ID = LGB.LGB_ID JOIN LST_JN_PRODUKSI LJP ON LJP.LJP_ID = A.LJP_ID JOIN JNNER JNN ON JNN.JN_NER = A.JN_NER LEFT OUTER JOIN LST_MO MO ON A.LMO_ID = MO.LMO_ID LEFT OUTER JOIN MST_CLIENT MC ON A.CLIENT_ID = MC.MCL_ID LEFT OUTER JOIN LST_JENIS_COAS JN_COAS ON A.MDS_JN_COAS = JN_COAS.MDS_JN_COAS "
-	whereRow := "where a.ldc_id = '" + ldc_id_param + "' and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between '"+beginDate+"' and '"+endDate+"'"
+	whereRow := "where a.ldc_id = '" + ldc_id_param + "' "
 
+	// filter polis
 	if noPolis != "" {
-		andPolis := " and no_polis in ('" + noPolis + "','')"
+		andPolis := " and no_polis in ('" + noPolis + "','') "
 		queryRow = queryTotalRow + whereRow + andPolis
 	} else {
 		queryRow = queryTotalRow + whereRow
+	}
+
+	// filter bisnis
+	if business != "" {
+		if beginDate == "" || endDate == "" {
+			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+				"status":  400,
+				"data":    "",
+				"message": "failed get data, please provide valid date periode",
+			})
+			return
+		}
+		whereBusiness := " and LBU_NOTE = '" + business + "' "
+		queryRow = queryRow + whereBusiness
+	}
+
+	// filter tgl
+	if beginDate != "" && endDate != "" {
+		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between  '" + beginDate + "' and '" + endDate + "' "
+		queryRow = queryRow + whereDate
 	}
 
 	countRows, err := db.Query(queryRow)
@@ -116,20 +156,40 @@ func GetProductionLt(c *gin.Context) {
 
 	// get query
 	var queryFinal string
-	query := "exec Warehouse_Asm_spk.dbo.SP_DETAIL_PRODUCTION_LONGTERM " + " "
-	// nnti tambahin get all rows
-	where := "'" + order + "', '" + sort + "', '" + page + "', '" + pageSize + "', 'where a.ldc_id = ''" + ldc_id_param + "''" + " " +
-			"and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between ''"+beginDate+"'' and ''"+endDate+"'' "
+	query := "exec SP_DETAIL_PRODUCTION_LONGTERM " + " "
+	where := "'" + order + "', '" + sort + "', '" + page + "', '" + pageSize + "', 'where a.ldc_id = ''" + ldc_id_param + "''" + " "
 
+	// filter polis
 	if noPolis != "" {
-		andPolis := " and no_polis in (''" + noPolis + "'','''')'"
+		andPolis := " and no_polis in (''" + noPolis + "'','''')"
 		queryFinal = query + where + andPolis
 	} else {
-		andPolis := "'"
-		queryFinal = query + where + andPolis
+		queryFinal = query + where
 	}
 
-	fmt.Println(queryFinal)
+	// filter bisnis
+	if business != "" {
+		if beginDate == "" || endDate == "" {
+			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti
+				"status":  400,
+				"data":    "",
+				"message": "failed get data, please provide valid date periode",
+			})
+			return
+		}
+		whereBusiness := " and LBU_NOTE = ''" + business + "'' "
+		queryFinal = queryFinal + whereBusiness
+	}
+
+	// filter tgl
+	if beginDate != "" && endDate != "" {
+		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between ''" + beginDate + "'' and ''" + endDate + "'' "
+		queryFinal = queryFinal + whereDate
+	}
+
+	queryFinal = queryFinal + "'"
+
+	fmt.Println("queryFinal : ", queryFinal)
 	// nnti tambhain klau yg login nik itasm, keluarin semua
 	rows, err := db.Query(queryFinal)
 
@@ -260,24 +320,24 @@ func GetProductionLt(c *gin.Context) {
 
 	pageNum, err := strconv.Atoi(page)
 	if err != nil {
-        // Handle error
-        fmt.Println("Error converting page to number:", err)
-        return
-    }
-	nextPage := pageNum+1
-	previousPage := pageNum-1
+		// Handle error
+		fmt.Println("Error converting page to number:", err)
+		return
+	}
+	nextPage := pageNum + 1
+	previousPage := pageNum - 1
 
 	// if no error
 	// Respond with JSON data
 	c.JSON(http.StatusOK, gin.H{
-		"status":       200,
-		"data":         datas,
-		"current_page": page,
-		"next_page": nextPage,
+		"status":        200,
+		"data":          datas,
+		"current_page":  page,
+		"next_page":     nextPage,
 		"previous_page": previousPage,
-		"max_page":     totalPage,
-		"page_size":    pageSize,
-		"total_data": totalRows,
-		"message":      "success get data",
+		"max_page":      totalPage,
+		"page_size":     pageSize,
+		"total_data":    totalRows,
+		"message":       "success get data",
 	})
 }
