@@ -46,8 +46,8 @@ func main() {
 	router.GET("/api/business-source", web.GetBusinessSource)
 
 	// auth
-	// router.POST("/api/login", auth.LoginSessionSql)
-	router.POST("/api/login", auth.LoginSession)
+	router.POST("/api/login", auth.LoginSessionSql) // sql
+	// router.POST("/api/login", auth.LoginSession) // oracle
 	// router.POST("/api/user-division", auth.LoginSession) // blm dipake
 	router.GET("/api/logout", auth.LogoutSessionSql)
 

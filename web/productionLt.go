@@ -71,6 +71,7 @@ func GetProductionLt(c *gin.Context) {
 	beginDate := c.Query("begin_date")
 	endDate := c.Query("end_date")
 	business := c.Query("business")
+	clientName := c.Query("client_name")
 
 	if sort == "" {
 		sort = "asc"
@@ -107,8 +108,22 @@ func GetProductionLt(c *gin.Context) {
 			})
 			return
 		}
-		whereBusiness := " and LBU_NOTE = '" + business + "' "
+		whereBusiness := " and LBU_NOTE like '%" + business + "%' "
 		queryRow = queryRow + whereBusiness
+	}
+
+	// filter client name
+	if clientName != "" {
+		if beginDate == "" || endDate == "" {
+			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+				"status":  400,
+				"data":    "",
+				"message": "failed get data, please provide valid date periode",
+			})
+			return
+		}
+		whereClient := " and MC.MCL_NAME like '%" + clientName + "%' "
+		queryRow = queryRow + whereClient
 	}
 
 	// filter tgl
@@ -177,8 +192,22 @@ func GetProductionLt(c *gin.Context) {
 			})
 			return
 		}
-		whereBusiness := " and LBU_NOTE = ''" + business + "'' "
+		whereBusiness := " and LBU_NOTE like ''%" + business + "%'' "
 		queryFinal = queryFinal + whereBusiness
+	}
+
+	// filter client name
+	if clientName != "" {
+		if beginDate == "" || endDate == "" {
+			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti
+				"status":  400,
+				"data":    "",
+				"message": "failed get data, please provide valid date periode",
+			})
+			return
+		}
+		whereClient := " and MCL_NAME like ''%" + clientName + "%'' "
+		queryFinal = queryFinal + whereClient
 	}
 
 	// filter tgl
@@ -200,13 +229,7 @@ func GetProductionLt(c *gin.Context) {
 
 	defer rows.Close() // Close the result set when done
 
-	// ga kepake
-	type NullableString struct {
-		Value string
-		Valid bool
-	}
-	//
-
+	
 	type Data struct {
 		Rn            string  `json:"Rn"`
 		TglProd       string  `json:"TglProd"`
