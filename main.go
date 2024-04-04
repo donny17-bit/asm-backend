@@ -37,7 +37,7 @@ func main() {
 
 	// production
 	router.GET("/api/production-longterm", web.GetProductionLt)
-	router.GET("/api/production-yearly", web.ProductionYr)
+	router.GET("/api/production-yearly", web.GetProductionYr)
 
 	// master
 	router.GET("/api/branch", web.GetBranch)
