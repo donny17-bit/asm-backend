@@ -6,13 +6,31 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/xuri/excelize/v2"
 )
 
-func exportProdLt(c *gin.Context) {
+// Convert column number to Excel column letter
+func toAlphaString(n int) string {
+	if n <= 0 {
+		return ""
+	}
+	alpha := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	alphaLen := len(alpha)
+	result := ""
+	for n > 0 {
+		index := (n - 1) % alphaLen
+		result = string(alpha[index]) + result
+		n = (n - 1) / alphaLen
+	}
+	return result
+}
+
+func ExportProdLt(c *gin.Context) {
 	err := godotenv.Load()
 
 	if err != nil {
@@ -116,6 +134,61 @@ func exportProdLt(c *gin.Context) {
 	}
 
 	queryFinal = queryFinal + "'"
-	
+	fmt.Println("queryFinal : ", queryFinal)
 
+	// Execute the query
+	rows, err := db.Query(queryFinal)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer rows.Close()
+
+	// Create a new Excel file
+    file := excelize.NewFile()
+    sheetName := "Sheet1"
+    // index := file.NewSheet(sheetName)
+
+	// Fetch the column names
+    columns, err := rows.Columns()
+    if err != nil {
+        fmt.Println(err)
+    }
+
+	// Write column headers to the Excel file
+	for colIndex, colName := range columns {
+		cell := toAlphaString(colIndex+1) + "1"
+		file.SetCellValue(sheetName, cell, colName)
+	}
+
+	// Write data rows to the Excel file
+    rowIndex := 2
+    for rows.Next() {
+        values := make([]interface{}, len(columns))
+        valuePtrs := make([]interface{}, len(columns))
+        for i := range values {
+            valuePtrs[i] = &values[i]
+        }
+        if err := rows.Scan(valuePtrs...); err != nil {
+            fmt.Println(err)
+        }
+        for colIndex, value := range values {
+			cell := toAlphaString(colIndex+1) + strconv.Itoa(rowIndex)
+			file.SetCellValue(sheetName, cell, value)
+		}
+        rowIndex++
+    }
+
+	// Save the Excel file
+	tempFile := "produksi_longterm.xlsx" // Temporarily save the file
+	if err := file.SaveAs(tempFile); err != nil {
+		fmt.Println(err)
+		c.String(http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+
+	// Serve the Excel file as a response
+	defer os.Remove(tempFile) // Remove the file after serving
+	c.Header("Content-Disposition", "attachment; filename=produksi_longterm.xlsx")
+	c.Header("Content-Type", "application/octet-stream")
+	c.File(tempFile)
 }

@@ -38,6 +38,7 @@ func main() {
 	// production
 	router.GET("/api/production-longterm", web.GetProductionLt)
 	router.GET("/api/production-yearly", web.GetProductionYr)
+	router.GET("/api/export-production-longterm", web.ExportProdLt)
 
 	// master
 	router.GET("/api/branch", web.GetBranch)

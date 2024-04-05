@@ -5,6 +5,7 @@ go 1.20
 require github.com/gin-gonic/gin v1.9.1
 
 require (
+	github.com/360EntSecGroup-Skylar/excelize v1.4.1 // indirect
 	github.com/appleboy/gin-jwt/v2 v2.9.2 // indirect
 	github.com/bytedance/sonic v1.11.2 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
