@@ -1,7 +1,7 @@
 package web
 
 import (
-	"asm-backend/auth"
+	"asm-backend/controller/auth"
 	"fmt"
 	"net/http"
 

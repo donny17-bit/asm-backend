@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Items</title>
+</head>
+<body>
+    <h1>Datas</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Tanggal Produksi</th>
+                <th>Begin Date</th>
+                <th>End Date</th>
+                <th>Mo</th>
+                <th>Client Name</th>
+                <th>Kanwil</th>
+                <th>Cabang</th>
+                <th>Perwakilan</th>
+                <th>Sub Perwakilan</th>
+                <th>Jnner</th>
+                <th>Jenis Produksi</th>
+                <th>Jenis Paket</th>
+                <th>Keterangan</th>
+                <th>Nama Ceding</th>
+                <th>Namaleader0</th>
+                <th>Namaleader1</th>
+                <th>Namaleader2</th>
+                <th>Namaleader3</th>
+                <th>Group Business</th>
+                <th>Business</th>
+                <th>No Kontrak</th>
+                <th>No Polis</th>
+                <th>No Cif</th>
+                <th>Prod ke</th>
+                <th>Nama Dealer</th>
+                <th>TSI</th>
+                <th>GPW</th>
+                <th>Disc</th>
+                <th>Disc 2</th>
+                <th>Comm</th>
+                <th>OC</th>
+                <th>Biaya Kantor Pusat</th>
+                <th>NGPW</th>
+                <th>RI</th>
+                <th>Ricom</th>
+                <th>NPW</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Datas }}
+            <tr>
+                <td>{{ .Rn}}</td>
+                <td>{{ .ProdDate}}</td>
+                <td>{{ .BeginDate}}</td>
+                <td>{{ .EndDate}}</td>
+                <td>{{ .Mo}}</td>
+                <td>{{ .ClientName}}</td>
+                <td>{{ .Kanwil}}</td>
+                <td>{{ .Cabang}}</td>
+                <td>{{ .Perwakilan}}</td>
+                <td>{{ .SubPerwakilan}}</td>
+                <td>{{ .Jnner}}</td>
+                <td>{{ .JenisProd}}</td>
+                <td>{{ .JenisPaket}}</td>                
+                <td>{{ .Ket}}</td>                
+                <td>{{ .NamaCeding}}</td>
+                <td>{{ .Namaleader0}}</td>
+                <td>{{ .Namaleader1}}</td>
+                <td>{{ .Namaleader2}}</td>
+                <td>{{ .Namaleader3}}</td>
+                <td>{{ .GroupBusiness}}</td>
+                <td>{{ .Business}}</td>
+                <td>{{ .NoKontrak}}</td>
+                <td>{{ .NoPolis}}</td>
+                <td>{{ .NoCif}}</td>
+                <td>{{ .ProdKe}}</td>
+                <td>{{ .NamaDealer}}</td>
+                <td>{{ .Tsi}}</td>
+                <td>{{ .Gpw}}</td>
+                <td>{{ .Disc}}</td>
+                <td>{{ .Disc2}}</td>
+                <td>{{ .Comm}}</td>
+                <td>{{ .Oc}}</td>
+                <td>{{ .Bkp}}</td>
+                <td>{{ .Ngpw}}</td>
+                <td>{{ .Ri}}</td>
+                <td>{{ .Ricom}}</td>
+                <td>{{ .Npw}}</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,7 +1,7 @@
 package web
 
 import (
-	"asm-backend/auth"
+	"asm-backend/controller/auth"
 	"asm-backend/model"
 	"fmt"
 	"net/http"
@@ -61,7 +61,7 @@ func ExportProdLt(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	session := sessions.Default(c)
 	ldc_id := session.Get("ldc_id") // default sesuai info login
 
@@ -112,7 +112,7 @@ func ExportProdLt(c *gin.Context) {
 	} else {
 		queryFinal = query + where
 	}
-	
+
 	// filter bisnis
 	if business != "" {
 		if beginDate == "" || endDate == "" {
@@ -144,15 +144,15 @@ func ExportProdLt(c *gin.Context) {
 	defer rows.Close()
 
 	// Create a new Excel file
-    file := excelize.NewFile()
-    sheetName := "Sheet1"
-    // index := file.NewSheet(sheetName)
+	file := excelize.NewFile()
+	sheetName := "Sheet1"
+	// index := file.NewSheet(sheetName)
 
 	// Fetch the column names
-    columns, err := rows.Columns()
-    if err != nil {
-        fmt.Println(err)
-    }
+	columns, err := rows.Columns()
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	// Write column headers to the Excel file
 	for colIndex, colName := range columns {
@@ -161,22 +161,22 @@ func ExportProdLt(c *gin.Context) {
 	}
 
 	// Write data rows to the Excel file
-    rowIndex := 2
-    for rows.Next() {
-        values := make([]interface{}, len(columns))
-        valuePtrs := make([]interface{}, len(columns))
-        for i := range values {
-            valuePtrs[i] = &values[i]
-        }
-        if err := rows.Scan(valuePtrs...); err != nil {
-            fmt.Println(err)
-        }
-        for colIndex, value := range values {
+	rowIndex := 2
+	for rows.Next() {
+		values := make([]interface{}, len(columns))
+		valuePtrs := make([]interface{}, len(columns))
+		for i := range values {
+			valuePtrs[i] = &values[i]
+		}
+		if err := rows.Scan(valuePtrs...); err != nil {
+			fmt.Println(err)
+		}
+		for colIndex, value := range values {
 			cell := toAlphaString(colIndex+1) + strconv.Itoa(rowIndex)
 			file.SetCellValue(sheetName, cell, value)
 		}
-        rowIndex++
-    }
+		rowIndex++
+	}
 
 	// Save the Excel file
 	tempFile := "produksi_longterm.xlsx" // Temporarily save the file
