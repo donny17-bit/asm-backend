@@ -3,35 +3,68 @@ package production
 import (
 	"asm-backend/model"
 	"fmt"
-	"math"
+
+	// "math"
 	"net/http"
+	// "strconv"
+	"time"
 
-	"strconv"
-
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-func GetProductionLt(c *gin.Context) {
+type InputData struct {
+	Begin_date string `json:"begin_date"`
+	End_date string `json:"end_date"`
+	No_polis string `json:"no_polis"`
+	No_cif string `json:"no_cif"`
+	Client_name string `json:"Client_name"`
+	Branch string `json:"Branch"`
+	Business string `json:"business"`
+	Sumbis string `json:"sumbis"`
+}
 
-	// // cek jika ldc_id ada di request
-	// var ldc_id_param string
 
-	// if c.Query("ldc_id") == "" {
-	// 	ldc_id_param = ldc_id.(string)
-	// } else {
-	// 	ldc_id_param = c.Query("ldc_id")
+func ProductionLt(c *gin.Context) {
+	session := sessions.Default(c)
+	ldc_id := session.Get("ldc_id") // default sesuai info login
+
+	// if ldc_id == nil {
+	// 	fmt.Println("error cabang kosong")
+	// 	return
 	// }
 
-	ldc_id_param := c.Query("ldc_id")
-	page := c.Query("page")          // req
-	pageSize := c.Query("page_size") // req
-	sort := c.Query("sort")          // opt
-	order := c.Query("order")        // req
-	noPolis := c.Query("no_polis")
-	beginDate := c.Query("begin_date")
-	endDate := c.Query("end_date")
-	business := c.Query("business")
-	clientName := c.Query("client_name")
+	// var inputData InputData
+	// if err := c.BindJSON(&inputData); err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+    //     return
+    // }
+
+	// // cek jika ldc_id ada di request
+	var ldc_id_param string
+
+	if ldc_id != nil {
+		ldc_id_param = ldc_id.(string)
+	} else {
+		ldc_id_param = c.PostForm("ldc_id")
+	}
+
+	page := "1"          // req
+	pageSize := "100"    // req
+	sort := "asc"        // opt
+	order := "thnbln, client_name"        // req
+	noPolis := c.PostForm("no_polis")
+	beginDate := c.PostForm("begin_date")
+	endDate := c.PostForm("end_date")
+	business := c.PostForm("business")
+	clientName := c.PostForm("client_name")
+
+	fmt.Println("ldc_id_param", ldc_id_param)
+	fmt.Println("noPolis", noPolis)
+	fmt.Println("beginDate", beginDate)
+	fmt.Println("endDate", endDate)
+	fmt.Println("business", business)
+	fmt.Println("clientName", clientName)
 
 	if sort == "" {
 		sort = "asc"
@@ -45,7 +78,7 @@ func GetProductionLt(c *gin.Context) {
 	}
 	defer db.Close()
 
-	// cek total row ------------------
+	// cek total row ----------------------------------------------------------------
 	var queryRow string
 	queryTotalRow := "select count(1) as total_rows FROM PRODUCTION_GABUNGAN_VIEW A JOIN MV_AGEN MA ON A.LAG_ID = MA.LAG_AGEN_ID JOIN LST_CABANG LC ON A.LDC_ID = LC.LDC_ID JOIN LST_BUSINESS LB ON A.LBU_ID = LB.LBU_ID JOIN LST_GRP_BUSINESS LGB ON LB.LGB_ID = LGB.LGB_ID JOIN LST_JN_PRODUKSI LJP ON LJP.LJP_ID = A.LJP_ID JOIN JNNER JNN ON JNN.JN_NER = A.JN_NER LEFT OUTER JOIN LST_MO MO ON A.LMO_ID = MO.LMO_ID LEFT OUTER JOIN MST_CLIENT MC ON A.CLIENT_ID = MC.MCL_ID LEFT OUTER JOIN LST_JENIS_COAS JN_COAS ON A.MDS_JN_COAS = JN_COAS.MDS_JN_COAS "
 	whereRow := "where a.ldc_id = '" + ldc_id_param + "' "
@@ -88,6 +121,18 @@ func GetProductionLt(c *gin.Context) {
 
 	// filter tgl
 	if beginDate != "" && endDate != "" {
+
+		// change date format
+		parsedBeginDate, err := time.Parse("2006-01-02", beginDate)
+		parsedEndDate, err := time.Parse("2006-01-02", endDate)
+    	if err != nil {
+        	fmt.Println("Error parsing date:", err)
+        	return
+    	}
+
+		beginDate = parsedBeginDate.Format("20060102")
+		endDate = parsedEndDate.Format("20060102")
+
 		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between  '" + beginDate + "' and '" + endDate + "' "
 		queryRow = queryRow + whereDate
 	}
@@ -112,17 +157,17 @@ func GetProductionLt(c *gin.Context) {
 		}
 	}
 
-	pageSizeNum, err := strconv.Atoi(pageSize)
-	if err != nil {
-		fmt.Println("Error convert page size to int :", err)
-		return
-	}
+	// pageSizeNum, err := strconv.Atoi(pageSize)
+	// if err != nil {
+	// 	fmt.Println("Error convert page size to int :", err)
+	// 	return
+	// }
 
-	totalPage := math.Ceil(float64(totalRows) / float64(pageSizeNum))
-	// totalPageFloat := float64(totalPage)
+	// totalPage := math.Ceil(float64(totalRows) / float64(pageSizeNum))
+	// // totalPageFloat := float64(totalPage)
 
 	// end count rows
-	// -----------------
+	// ------------------------------------------------------------------------------------------------------------
 
 	if err := countRows.Err(); err != nil {
 		fmt.Println("Error iterating count rows:", err)
@@ -300,27 +345,37 @@ func GetProductionLt(c *gin.Context) {
 		return
 	}
 
-	pageNum, err := strconv.Atoi(page)
-	if err != nil {
-		// Handle error
-		fmt.Println("Error converting page to number:", err)
-		return
-	}
-	nextPage := pageNum + 1
-	previousPage := pageNum - 1
+	// pageNum, err := strconv.Atoi(page)
+	// if err != nil {
+	// 	// Handle error
+	// 	fmt.Println("Error converting page to number:", err)
+	// 	return
+	// }
+	// nextPage := pageNum + 1
+	// previousPage := pageNum - 1
+
+	// "data"	: datas, this is array object type
 
 	// if no error
-	// Respond with JSON data
-	// change to respond with redirect html page
-	c.JSON(http.StatusOK, gin.H{
-		"status":        200,
-		"data":          datas,
-		"current_page":  page,
-		"next_page":     nextPage,
-		"previous_page": previousPage,
-		"max_page":      totalPage,
-		"page_size":     pageSize,
-		"total_data":    totalRows,
-		"message":       "success get data",
+	// Respond with redirect html page
+	c.HTML(http.StatusOK, "production.html", gin.H{
+		// "ProdDate":  data.ProdDate,
+		// "JenisProd": data.JenisProd,
+		"data"	: datas,
+		// "Message": data.Message,
 	})
+
+	// Respond with JSON data
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"status":        200,
+	// 	"data":          datas,
+	// 	"current_page":  page,
+	// 	// "next_page":     nextPage,
+	// 	// "previous_page": previousPage,
+	// 	// "max_page":      totalPage,
+	// 	"page_size":     pageSize,
+	// 	"total_data":    totalRows,
+	// 	"message":       "success get data",
+	// })
+	
 }

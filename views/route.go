@@ -111,12 +111,12 @@ func GetProductionExample(c *gin.Context) {
 	}
 
 	session := sessions.Default(c)
-	ldc_id := session.Get("ldc_id") // default sesuai info login
+	// ldc_id := session.Get("ldc_id") // default sesuai info login
 
-	if ldc_id == nil {
-		fmt.Println("error cabang kosong")
-		return
-	}
+	// if ldc_id == nil {
+	// 	fmt.Println("error cabang kosong")
+	// 	return
+	// }
 
 	id := session.Get("id")
 	nik := session.Get("nik")
@@ -128,7 +128,7 @@ func GetProductionExample(c *gin.Context) {
 	fmt.Println("lastActivity : ", lastActivity)
 	fmt.Println("expiration : ", expiration)
 
-	resp, err := http.Get("http://localhost:8080/api/production-longterm?ldc_id=125&page=1&page_size=100&order=thnbln,%20client_name&begin_date=20240101&end_date=20240416")
+	resp, err := http.Get("http://localhost:8080/api/production-longterm?ldc_id=125&page=1&page_size=100&order=thnbln,%20client_name&begin_date=20240101&end_date=20240531")
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error fetching data from API")
 		return
@@ -152,7 +152,7 @@ func GetProductionExample(c *gin.Context) {
 	// fmt.Println("Data.JenisProd : ", data.JenisProd)
 
 	// Render the HTML template with the data
-	c.HTML(http.StatusOK, "index.html", gin.H{
+	c.HTML(http.StatusOK, "production.html", gin.H{
 		// "ProdDate":  data.ProdDate,
 		// "JenisProd": data.JenisProd,
 		"Message": data.Message,
