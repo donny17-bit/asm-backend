@@ -34,11 +34,11 @@ func ProductionLt(c *gin.Context) {
 	// 	return
 	// }
 
-	// var inputData InputData
-	// if err := c.BindJSON(&inputData); err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-    //     return
-    // }
+	var inputData InputData
+	if err := c.BindJSON(&inputData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
 	// // cek jika ldc_id ada di request
 	var ldc_id_param string
@@ -50,14 +50,17 @@ func ProductionLt(c *gin.Context) {
 	}
 
 	page := "1"          // req
-	pageSize := "100"    // req
+	pageSize := "10"    // req
 	sort := "asc"        // opt
 	order := "thnbln, client_name"        // req
 	noPolis := c.PostForm("no_polis")
-	beginDate := c.PostForm("begin_date")
-	endDate := c.PostForm("end_date")
+	beginDate := inputData.Begin_date
+	endDate := inputData.End_date
 	business := c.PostForm("business")
 	clientName := c.PostForm("client_name")
+
+	var formatedBeginDate string
+	var formatedEndDate string
 
 	fmt.Println("ldc_id_param", ldc_id_param)
 	fmt.Println("noPolis", noPolis)
@@ -130,10 +133,10 @@ func ProductionLt(c *gin.Context) {
         	return
     	}
 
-		beginDate = parsedBeginDate.Format("20060102")
-		endDate = parsedEndDate.Format("20060102")
+		formatedBeginDate = parsedBeginDate.Format("20060102")
+		formatedEndDate = parsedEndDate.Format("20060102")
 
-		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between  '" + beginDate + "' and '" + endDate + "' "
+		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between  '" + formatedBeginDate + "' and '" + formatedEndDate + "' "
 		queryRow = queryRow + whereDate
 	}
 
@@ -146,9 +149,9 @@ func ProductionLt(c *gin.Context) {
 
 	defer countRows.Close()
 
-	var totalRows int
-	// var totalPage float64
+	var totalRows string
 
+	// save query result to total rows variable
 	for countRows.Next() {
 		err := countRows.Scan(&totalRows)
 
@@ -156,6 +159,8 @@ func ProductionLt(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error in count rows": err.Error()})
 		}
 	}
+
+	fmt.Println("total rows", totalRows)
 
 	// pageSizeNum, err := strconv.Atoi(pageSize)
 	// if err != nil {
@@ -166,13 +171,14 @@ func ProductionLt(c *gin.Context) {
 	// totalPage := math.Ceil(float64(totalRows) / float64(pageSizeNum))
 	// // totalPageFloat := float64(totalPage)
 
-	// end count rows
-	// ------------------------------------------------------------------------------------------------------------
-
 	if err := countRows.Err(); err != nil {
 		fmt.Println("Error iterating count rows:", err)
 		return
 	}
+
+	// end count rows
+	// ------------------------------------------------------------------------------------------------------------
+
 
 	// get query
 	var queryFinal string
@@ -217,7 +223,7 @@ func ProductionLt(c *gin.Context) {
 
 	// filter tgl
 	if beginDate != "" && endDate != "" {
-		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between ''" + beginDate + "'' and ''" + endDate + "'' "
+		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between ''" + formatedBeginDate + "'' and ''" + formatedEndDate + "'' "
 		queryFinal = queryFinal + whereDate
 	}
 
@@ -358,24 +364,26 @@ func ProductionLt(c *gin.Context) {
 
 	// if no error
 	// Respond with redirect html page
-	c.HTML(http.StatusOK, "production.html", gin.H{
-		// "ProdDate":  data.ProdDate,
-		// "JenisProd": data.JenisProd,
-		"data"	: datas,
-		// "Message": data.Message,
-	})
+	// c.HTML(http.StatusOK, "production.html", gin.H{
+	// 	"begin_date": beginDate,
+	// 	"end_date": endDate,
+	// 	"no_polis": noPolis,
+	// 	"client_name": clientName,
+	// 	"business": business,
+	// 	"data"	: datas,
+	// })
 
 	// Respond with JSON data
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"status":        200,
-	// 	"data":          datas,
-	// 	"current_page":  page,
-	// 	// "next_page":     nextPage,
-	// 	// "previous_page": previousPage,
-	// 	// "max_page":      totalPage,
-	// 	"page_size":     pageSize,
-	// 	"total_data":    totalRows,
-	// 	"message":       "success get data",
-	// })
+	c.JSON(http.StatusOK, gin.H{
+		"status":        200,
+		"data":          datas,
+		"current_page":  page,
+		// "next_page":     nextPage,
+		// "previous_page": previousPage,
+		// "max_page":      totalPage,
+		"page_size":     pageSize,
+		"total_data":    totalRows,
+		"message":       "success get data",
+	})
 	
 }
