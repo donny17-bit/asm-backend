@@ -3,10 +3,9 @@ package production
 import (
 	"asm-backend/model"
 	"fmt"
-
-	// "math"
+	"math"
 	"net/http"
-	// "strconv"
+	"strconv"
 	"time"
 
 	"github.com/gin-contrib/sessions"
@@ -14,6 +13,7 @@ import (
 )
 
 type InputData struct {
+	Page string `json:"page"`
 	Begin_date string `json:"begin_date"`
 	End_date string `json:"end_date"`
 	No_polis string `json:"no_polis"`
@@ -49,7 +49,7 @@ func ProductionLt(c *gin.Context) {
 		ldc_id_param = c.PostForm("ldc_id")
 	}
 
-	page := "1"          // req
+	page := inputData.Page          // req
 	pageSize := "10"    // req
 	sort := "asc"        // opt
 	order := "thnbln, client_name"        // req
@@ -149,7 +149,7 @@ func ProductionLt(c *gin.Context) {
 
 	defer countRows.Close()
 
-	var totalRows string
+	var totalRows int
 
 	// save query result to total rows variable
 	for countRows.Next() {
@@ -162,13 +162,13 @@ func ProductionLt(c *gin.Context) {
 
 	fmt.Println("total rows", totalRows)
 
-	// pageSizeNum, err := strconv.Atoi(pageSize)
-	// if err != nil {
-	// 	fmt.Println("Error convert page size to int :", err)
-	// 	return
-	// }
+	pageSizeNum, err := strconv.Atoi(pageSize)
+	if err != nil {
+		fmt.Println("Error convert page size to int :", err)
+		return
+	}
 
-	// totalPage := math.Ceil(float64(totalRows) / float64(pageSizeNum))
+	totalPage := math.Ceil(float64(totalRows) / float64(pageSizeNum))
 	// // totalPageFloat := float64(totalPage)
 
 	if err := countRows.Err(); err != nil {
@@ -351,14 +351,21 @@ func ProductionLt(c *gin.Context) {
 		return
 	}
 
-	// pageNum, err := strconv.Atoi(page)
+	pageNum, err := strconv.Atoi(page)
 	// if err != nil {
 	// 	// Handle error
 	// 	fmt.Println("Error converting page to number:", err)
 	// 	return
 	// }
-	// nextPage := pageNum + 1
-	// previousPage := pageNum - 1
+	nextPage := pageNum + 1
+
+	// check if next page is greater than total page or not
+	if nextPage > int(totalPage) {
+		nextPage = int(totalPage)
+	}
+
+	previousPage := pageNum - 1
+
 
 	// "data"	: datas, this is array object type
 
@@ -373,15 +380,27 @@ func ProductionLt(c *gin.Context) {
 	// 	"data"	: datas,
 	// })
 
+	currentPage, err := strconv.Atoi(page)
+	if err != nil {
+		fmt.Println("Error convert page size to int :", err)
+		return
+	}
+
+	pageSizeInt, err := strconv.Atoi(pageSize)
+	if err != nil {
+		fmt.Println("Error convert page size to int :", err)
+		return
+	}
+
 	// Respond with JSON data
 	c.JSON(http.StatusOK, gin.H{
 		"status":        200,
 		"data":          datas,
-		"current_page":  page,
-		// "next_page":     nextPage,
-		// "previous_page": previousPage,
-		// "max_page":      totalPage,
-		"page_size":     pageSize,
+		"current_page":  currentPage,
+		"next_page":     nextPage,
+		"previous_page": previousPage,
+		"max_page":      totalPage,
+		"page_size":     pageSizeInt,
 		"total_data":    totalRows,
 		"message":       "success get data",
 	})

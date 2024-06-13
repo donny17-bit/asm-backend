@@ -438,6 +438,8 @@
                     Download Excel
                   </button>
                 </div>
+
+                <!-- table data -->
                 <div class="table-responsive">
                   <table
                     class="table table-bordered"
@@ -532,56 +534,95 @@
                   </table>
                 </div>
 
-                <!-- pagination -->
-                <div class="d-flex justify-content-end mt-3" id="pagination">
-                  <button
-                    class="btn btn-outline-secondary mb-2"
-                    id="previous"
-                    type="button"
-                    style="
-                      height: 35px;
-                      width: 100px;
-                      border-radius: 8px 0% 0% 8px;
-                    "
-                  >
-                    Previous
-                  </button>
-                  <button
-                    class="btn btn-outline-secondary mb-2"
-                    id="1"
-                    type="button"
-                    style="height: 35px; border-radius: 0px"
-                  >
-                    1
-                  </button>
-                  <button
-                    class="btn btn-outline-secondary mb-2"
-                    id="1"
-                    type="button"
-                    style="height: 35px; border-radius: 0px"
-                  >
-                    2
-                  </button>
-                  <button
-                    class="btn btn-outline-secondary mb-2"
-                    id="1"
-                    type="button"
-                    style="height: 35px; border-radius: 0px"
-                  >
-                    3
-                  </button>
-                  <button
-                    class="btn btn-outline-secondary mb-2 rounded-end"
-                    id="next"
-                    type="button"
-                    style="
-                      height: 35px;
-                      width: 100px;
-                      border-radius: 0px 8px 8px 0px;
-                    "
-                  >
-                    Next
-                  </button>
+                <div class="d-flex justify-content-between mt-3">
+                  <!-- data information -->
+                  <div class="d-flex mt-2">
+                    <p>Total data :&nbsp;</p>
+                    <p id="total_data">0</p>
+                  </div>
+                  <!-- pagination -->
+                  <div class="d-flex" id="pagination">
+                    <button
+                      class="btn btn-outline-secondary mb-2 disabled"
+                      id="previous"
+                      type="button"
+                      style="
+                        height: 35px;
+                        width: 50px;
+                        border-radius: 8px 0% 0% 8px;
+                      "
+                    >
+                      <<
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="first_page"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      1
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="more_previous"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      ...
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="previous_page"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      2
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 disabled"
+                      id="current_page"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      1
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="next_page"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      4
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="more_next"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      ...
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="last_page"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      1
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 rounded-end disabled"
+                      id="next"
+                      type="button"
+                      style="
+                        height: 35px;
+                        width: 50px;
+                        border-radius: 0px 8px 8px 0px;
+                      "
+                    >
+                      >>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -659,6 +700,8 @@
 
     <!-- Page level custom scripts -->
     <script src="../static/js/demo/datatables-demo.js"></script>
+    <script src="../static/js/fetch.js"></script>
     <script src="../static/js/table.js"></script>
+    <script src="../static/js/pagination.js"></script>
   </body>
 </html>

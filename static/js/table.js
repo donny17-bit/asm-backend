@@ -1,40 +1,12 @@
-document
-  .getElementById("formFilter")
-  .addEventListener("submit", function (event) {
-    event.preventDefault();
+function table(data) {
+  console.log(data);
+  const totalData = document.getElementById("total_data");
+  totalData.textContent = data.total_data;
 
-    const begin_date = document.getElementById("begin_date").value;
-    const end_date = document.getElementById("end_date").value;
-    const no_polis = document.getElementById("no_polis").value;
-    const no_cif = document.getElementById("no_cif").value;
-    const client_name = document.getElementById("client_name").value;
-    const branch = document.getElementById("branch").value;
-    const business = document.getElementById("business").value;
-    const sumbis = document.getElementById("sumbis").value;
-
-    // Call the API (assuming a POST request)
-    fetch("/api/production-longterm", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        begin_date: begin_date,
-        end_date: end_date,
-        no_polis: no_polis,
-        no_cif: no_cif,
-        client_name: client_name,
-        branch: branch,
-        business: business,
-        sumbis: sumbis,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const tableBody = document.querySelector("#dataTable tbody");
-        tableBody.innerHTML = "";
-        data.data.forEach((item) => {
-          tableBody.innerHTML += `<tr>
+  const tableBody = document.querySelector("#dataTable tbody");
+  tableBody.innerHTML = "";
+  data.data.forEach((item) => {
+    tableBody.innerHTML += `<tr>
                                         <td>${item.Rn}</td>
                                         <td>${item.ProdDate}</td>
                                         <td>${item.BeginDate}</td>
@@ -42,8 +14,36 @@ document
                                         <td>${item.Mo}</td>
                                         <td>${item.ClientName}</td>
                                         <td>${item.Kanwil}</td>
-                                    </tr>`;
-        });
-      })
-      .catch((error) => console.error("Error:", error));
+                                        <td>${item.Cabang}</td>
+                                        <td>${item.Perwakilan}</td>
+                                        <td>${item.SubPerwakilan}</td>
+                                        <td>${item.Jnner}</td>
+                                        <td>${item.JenisProd}</td>
+                                        <td>${item.JenisPaket}</td>
+                                        <td>${item.Ket}</td>
+                                        <td>${item.NamaCeding}</td>
+                                        <td>${item.Namaleader0}</td>
+                                        <td>${item.Namaleader1}</td>
+                                        <td>${item.Namaleader2}</td>
+                                        <td>${item.Namaleader3}</td>
+                                        <td>${item.GroupBusiness}</td>
+                                        <td>${item.Business}</td>
+                                        <td>${item.NoKontrak}</td>
+                                        <td>${item.NoPolis}</td>
+                                        <td>${item.NoCif}</td>
+                                        <td>${item.ProdKe}</td>
+                                        <td>${item.NamaDealer}</td>
+                                        <td>${item.Tsi}</td>
+                                        <td>${item.Gpw}</td>
+                                        <td>${item.Disc}</td>
+                                        <td>${item.Disc2}</td>
+                                        <td>${item.Comm}</td>
+                                        <td>${item.Oc}</td>
+                                        <td>${item.Bkp}</td>
+                                        <td>${item.Ngpw}</td>
+                                        <td>${item.Ri}</td>
+                                        <td>${item.Ricom}</td>
+                                        <td>${item.Npw}</td>            
+                                      </tr>`;
   });
+}
