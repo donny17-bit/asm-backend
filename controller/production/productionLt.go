@@ -14,6 +14,7 @@ import (
 
 type InputData struct {
 	Page string `json:"page"`
+	Page_size string `json:"page_size"`
 	Begin_date string `json:"begin_date"`
 	End_date string `json:"end_date"`
 	No_polis string `json:"no_polis"`
@@ -50,7 +51,7 @@ func ProductionLt(c *gin.Context) {
 	}
 
 	page := inputData.Page          // req
-	pageSize := "10"    // req
+	pageSize := inputData.Page_size    // req
 	sort := "asc"        // opt
 	order := "thnbln, client_name"        // req
 	noPolis := c.PostForm("no_polis")

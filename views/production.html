@@ -396,35 +396,38 @@
                 </form>
               </div>
             </div>
-            <!-- DataTables -->
             <div class="card shadow mb-4" id="tableDisplay">
               <div class="card-body">
                 <div class="d-flex justify-content-between">
+                  <!-- filter row show data -->
                   <div class="d-flex">
                     <p class="mt-2">Show</p>
                     <div class="dropdown mx-2">
                       <button
                         class="btn btn-outline-secondary dropdown-toggle"
                         type="button"
+                        id="page_size"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
-                        value=""
+                        value="10"
                       >
                         10
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">10</a></li>
                         <li>
-                          <a class="dropdown-item" href="#">50</a>
+                          <a class="dropdown-item" id="page_size_10">10</a>
                         </li>
                         <li>
-                          <a class="dropdown-item" href="#">100</a>
+                          <a class="dropdown-item" id="page_size_50">50</a>
                         </li>
                         <li>
-                          <a class="dropdown-item" href="#">500</a>
+                          <a class="dropdown-item" id="page_size_100">100</a>
                         </li>
                         <li>
-                          <a class="dropdown-item" href="#">1000</a>
+                          <a class="dropdown-item" id="page_size_500">500</a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" id="page_size_1000">1000</a>
                         </li>
                       </ul>
                     </div>
@@ -703,5 +706,6 @@
     <script src="../static/js/fetch.js"></script>
     <script src="../static/js/table.js"></script>
     <script src="../static/js/pagination.js"></script>
+    <script src="../static/js/pageSize.js"></script>
   </body>
 </html>

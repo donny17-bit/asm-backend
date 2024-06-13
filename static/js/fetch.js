@@ -3,6 +3,7 @@ document
   .addEventListener("submit", function (event) {
     event.preventDefault();
 
+    const page_size = document.getElementById("page_size").value;
     const begin_date = document.getElementById("begin_date").value;
     const end_date = document.getElementById("end_date").value;
     const no_polis = document.getElementById("no_polis").value;
@@ -20,6 +21,7 @@ document
       },
       body: JSON.stringify({
         page: "1",
+        page_size: page_size,
         begin_date: begin_date,
         end_date: end_date,
         no_polis: no_polis,
@@ -47,6 +49,7 @@ document
     event.preventDefault();
 
     const next_page = document.getElementById("next_page").textContent;
+    const page_size = document.getElementById("page_size").value;
     const begin_date = document.getElementById("begin_date").value;
     const end_date = document.getElementById("end_date").value;
     const no_polis = document.getElementById("no_polis").value;
@@ -64,6 +67,7 @@ document
       },
       body: JSON.stringify({
         page: next_page,
+        page_size: page_size,
         begin_date: begin_date,
         end_date: end_date,
         no_polis: no_polis,
@@ -91,6 +95,7 @@ document
     event.preventDefault();
 
     const previous_page = document.getElementById("previous_page").textContent;
+    const page_size = document.getElementById("page_size").value;
     const begin_date = document.getElementById("begin_date").value;
     const end_date = document.getElementById("end_date").value;
     const no_polis = document.getElementById("no_polis").value;
@@ -108,6 +113,7 @@ document
       },
       body: JSON.stringify({
         page: previous_page,
+        page_size: page_size,
         begin_date: begin_date,
         end_date: end_date,
         no_polis: no_polis,
@@ -134,6 +140,7 @@ document
   .addEventListener("click", function (event) {
     event.preventDefault();
 
+    const page_size = document.getElementById("page_size").value;
     const begin_date = document.getElementById("begin_date").value;
     const end_date = document.getElementById("end_date").value;
     const no_polis = document.getElementById("no_polis").value;
@@ -151,6 +158,7 @@ document
       },
       body: JSON.stringify({
         page: "1",
+        page_size: page_size,
         begin_date: begin_date,
         end_date: end_date,
         no_polis: no_polis,
@@ -178,6 +186,7 @@ document
     event.preventDefault();
 
     const last_page = document.getElementById("last_page").textContent;
+    const page_size = document.getElementById("page_size").value;
     const begin_date = document.getElementById("begin_date").value;
     const end_date = document.getElementById("end_date").value;
     const no_polis = document.getElementById("no_polis").value;
@@ -195,6 +204,7 @@ document
       },
       body: JSON.stringify({
         page: last_page,
+        page_size: page_size,
         begin_date: begin_date,
         end_date: end_date,
         no_polis: no_polis,
@@ -220,6 +230,7 @@ document.getElementById("previous").addEventListener("click", function (event) {
   event.preventDefault();
 
   const previous_page = document.getElementById("previous_page").textContent;
+  const page_size = document.getElementById("page_size").value;
   const begin_date = document.getElementById("begin_date").value;
   const end_date = document.getElementById("end_date").value;
   const no_polis = document.getElementById("no_polis").value;
@@ -237,6 +248,7 @@ document.getElementById("previous").addEventListener("click", function (event) {
     },
     body: JSON.stringify({
       page: previous_page,
+      page_size: page_size,
       begin_date: begin_date,
       end_date: end_date,
       no_polis: no_polis,
@@ -262,6 +274,7 @@ document.getElementById("next").addEventListener("click", function (event) {
   event.preventDefault();
 
   const next_page = document.getElementById("next_page").textContent;
+  const page_size = document.getElementById("page_size").value;
   const begin_date = document.getElementById("begin_date").value;
   const end_date = document.getElementById("end_date").value;
   const no_polis = document.getElementById("no_polis").value;
@@ -279,6 +292,7 @@ document.getElementById("next").addEventListener("click", function (event) {
     },
     body: JSON.stringify({
       page: next_page,
+      page_size: page_size,
       begin_date: begin_date,
       end_date: end_date,
       no_polis: no_polis,
