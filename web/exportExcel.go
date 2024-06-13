@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -30,7 +31,21 @@ func toAlphaString(n int) string {
 	return result
 }
 
-func ExportProdLt(c *gin.Context) {
+
+type InputData struct {
+	Page string `json:"page"`
+	Page_size string `json:"page_size"`
+	Begin_date string `json:"begin_date"`
+	End_date string `json:"end_date"`
+	No_polis string `json:"no_polis"`
+	No_cif string `json:"no_cif"`
+	Client_name string `json:"Client_name"`
+	Branch string `json:"Branch"`
+	Business string `json:"business"`
+	Sumbis string `json:"sumbis"`
+}
+
+func ExportProdLt(c *gin.Context) {	
 	err := godotenv.Load()
 
 	if err != nil {
@@ -70,23 +85,34 @@ func ExportProdLt(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("masuk 1")
+
+	var inputData InputData
+	if err := c.BindJSON(&inputData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+	fmt.Println("masuk 2")
+
 	// cek jika ldc_id ada di request
 	var ldc_id_param string
 
 	if c.Query("ldc_id") == "" {
 		ldc_id_param = ldc_id.(string)
 	} else {
-		ldc_id_param = c.Query("ldc_id")
+		ldc_id_param = c.PostForm("ldc_id")
 	}
 
 	page := c.Query("page")          // req
 	pageSize := c.Query("page_size") // req
-	sort := c.Query("sort")          // opt
-	order := c.Query("order")        // req
+	sort := "asc"          // opt
+	order := "thnbln, client_name"        // req
 	noPolis := c.Query("no_polis")
-	beginDate := c.Query("begin_date")
-	endDate := c.Query("end_date")
+	beginDate := inputData.Begin_date
+	endDate := inputData.End_date
 	business := c.Query("business")
+
 
 	if sort == "" {
 		sort = "asc"
@@ -104,7 +130,7 @@ func ExportProdLt(c *gin.Context) {
 	var queryFinal string
 	query := "exec SP_DETAIL_PRODUCTION_LONGTERM " + " "
 	where := "'" + order + "', '" + sort + "', '" + page + "', '" + pageSize + "', 'where a.ldc_id = ''" + ldc_id_param + "''" + " "
-
+	
 	// filter polis
 	if noPolis != "" {
 		andPolis := " and no_polis in (''" + noPolis + "'','''')"
@@ -129,7 +155,22 @@ func ExportProdLt(c *gin.Context) {
 
 	// filter tgl
 	if beginDate != "" && endDate != "" {
-		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between ''" + beginDate + "'' and ''" + endDate + "'' "
+
+		fmt.Println("begin_date : ", beginDate)
+		fmt.Println("end_date : ", endDate)
+
+		// change date format
+		parsedBeginDate, err := time.Parse("2006-01-02", beginDate)
+		parsedEndDate, err := time.Parse("2006-01-02", endDate)
+    	if err != nil {
+        	fmt.Println("Error parsing date:", err)
+        	return
+    	}
+
+		formatedBeginDate := parsedBeginDate.Format("20060102")
+		formatedEndDate := parsedEndDate.Format("20060102")
+
+		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between ''" + formatedBeginDate + "'' and ''" + formatedEndDate + "'' "
 		queryFinal = queryFinal + whereDate
 	}
 
@@ -179,7 +220,7 @@ func ExportProdLt(c *gin.Context) {
 	}
 
 	// Save the Excel file
-	tempFile := "produksi_longterm.xlsx" // Temporarily save the file
+	tempFile := "Detail_Produksi_Longterm.xlsx" // Temporarily save the file
 	if err := file.SaveAs(tempFile); err != nil {
 		fmt.Println(err)
 		c.String(http.StatusInternalServerError, "Internal Server Error")
@@ -188,7 +229,7 @@ func ExportProdLt(c *gin.Context) {
 
 	// Serve the Excel file as a response
 	defer os.Remove(tempFile) // Remove the file after serving
-	c.Header("Content-Disposition", "attachment; filename=produksi_longterm.xlsx")
+	c.Header("Content-Disposition", "attachment; filename=Detail_Produksi_Longterm.xlsx")
 	c.Header("Content-Type", "application/octet-stream")
 	c.File(tempFile)
 }
