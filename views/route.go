@@ -18,11 +18,11 @@ func GetDashboard(c *gin.Context) {
 	c.HTML(http.StatusOK, "dashboard.html", nil)
 }
 
-func GetProduction(c *gin.Context) {
+func GetProductionLt(c *gin.Context) {
 	c.HTML(http.StatusOK, "production.html", nil)
 }
 
-func GetProductionYearly(c *gin.Context) {
+func GetProductionYr(c *gin.Context) {
 	c.HTML(http.StatusOK, "production-yearly.html", nil)
 }
 

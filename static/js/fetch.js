@@ -13,8 +13,11 @@ document
     const business = document.getElementById("business").value; // include
     const sumbis = document.getElementById("sumbis").value; // include
 
+    const url = window.location.href;
+    const path = url.split("/").pop();
+
     // Call the API (assuming a POST request)
-    fetch("/api/production-longterm", {
+    fetch(`/api/${path}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

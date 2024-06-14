@@ -40,17 +40,14 @@ func main() {
 	// views
 	router.GET("/login", views.GetLogin)
 	router.GET("/dashboard", views.GetDashboard)
-	router.GET("/produksi-longterm", views.GetProduction)
-	router.GET("/produksi-yearly", views.GetProductionYearly)
-
+	router.GET("/production-longterm", views.GetProductionLt)
+	router.GET("/production-yearly", views.GetProductionYr)
 
 	// production lt
-	router.POST("/produksi-longterm", production.ProductionLt)
 	router.POST("/api/production-longterm", production.ProductionLt)
 	router.POST("/api/export-production-longterm", production.ExportProdLt)
 
 	// production yr
-	router.POST("/produksi-tahunan", production.ProductionYr)
 	router.POST("/api/production-yearly", production.ProductionYr)
 
 	// master
