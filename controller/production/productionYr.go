@@ -14,7 +14,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func GetProductionYr(c *gin.Context) {
+func ProductionYr(c *gin.Context) {
 	err := godotenv.Load()
 
 	if err != nil {

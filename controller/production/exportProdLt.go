@@ -1,4 +1,4 @@
-package web
+package production
 
 import (
 	"asm-backend/controller/auth"
@@ -29,17 +29,6 @@ func toAlphaString(n int) string {
 		n = (n - 1) / alphaLen
 	}
 	return result
-}
-
-type InputData struct {
-	Begin_date  string `json:"begin_date"`
-	End_date    string `json:"end_date"`
-	No_polis    string `json:"no_polis"`
-	No_cif      string `json:"no_cif"`
-	Client_name string `json:"client_name"`
-	Branch      string `json:"branch"`
-	Business    string `json:"business"`
-	Sumbis      string `json:"sumbis"`
 }
 
 func ExportProdLt(c *gin.Context) {
