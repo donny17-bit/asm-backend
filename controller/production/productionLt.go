@@ -85,6 +85,16 @@ func ProductionLt(c *gin.Context) {
 	}
 	defer db.Close()
 
+	// field begin date & end date harus di isi
+	if beginDate == "" || endDate == "" {
+		c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+			"status":  400,
+			"data":    "",
+			"message": "Failed get data, please provide valid date periode",
+		})
+		return
+	}
+
 	// cek total row ----------------------------------------------------------------
 	var queryRow string
 	queryTotalRow := "select count(1) as total_rows FROM PRODUCTION_GABUNGAN_VIEW A JOIN MV_AGEN MA ON A.LAG_ID = MA.LAG_AGEN_ID JOIN LST_CABANG LC ON A.LDC_ID = LC.LDC_ID JOIN LST_BUSINESS LB ON A.LBU_ID = LB.LBU_ID JOIN LST_GRP_BUSINESS LGB ON LB.LGB_ID = LGB.LGB_ID JOIN LST_JN_PRODUKSI LJP ON LJP.LJP_ID = A.LJP_ID JOIN JNNER JNN ON JNN.JN_NER = A.JN_NER LEFT OUTER JOIN LST_MO MO ON A.LMO_ID = MO.LMO_ID LEFT OUTER JOIN MST_CLIENT MC ON A.CLIENT_ID = MC.MCL_ID LEFT OUTER JOIN LST_JENIS_COAS JN_COAS ON A.MDS_JN_COAS = JN_COAS.MDS_JN_COAS "
@@ -108,42 +118,18 @@ func ProductionLt(c *gin.Context) {
 
 	// filter bisnis
 	if business != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereBusiness := " and (LBU_NOTE like '%" + business + "%' OR LGB_NOTE like '%" + business + "%') "
 		queryRow = queryRow + whereBusiness
 	}
 
 	// filter client name
 	if clientName != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereClient := " and MC.MCL_NAME like '%" + clientName + "%' "
 		queryRow = queryRow + whereClient
 	}
 
 	// filter sumbis
 	if businessSource != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereBusinessSource := " and (MA.NAMALEADER0 like '%" + businessSource + "%' OR " +
 			"MA.NAMALEADER1 like '%" + businessSource + "%' OR " +
 			"MA.NAMALEADER2 like '%" + businessSource + "%' OR " + 
@@ -153,14 +139,6 @@ func ProductionLt(c *gin.Context) {
 
 	// filter branch
 	if branch != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereBranch := " and (LC.KANWIL LIKE '%" + branch + "%' OR " + 
 			"LC.CABANG LIKE '%" + branch + "%' OR "+
 			"LC.PERWAKILAN LIKE '%" + branch + "%' OR "+
@@ -170,7 +148,6 @@ func ProductionLt(c *gin.Context) {
 
 	// filter tgl
 	if beginDate != "" && endDate != "" {
-
 		// change date format
 		parsedBeginDate, err := time.Parse("2006-01-02", beginDate)
 		parsedEndDate, err := time.Parse("2006-01-02", endDate)
@@ -250,43 +227,18 @@ func ProductionLt(c *gin.Context) {
 
 	// filter bisnis
 	if business != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereBusiness := " and (LBU_NOTE like ''%" + business + "%'' OR LGB_NOTE like ''%" + business + "%'') "
 		queryFinal = queryFinal + whereBusiness
 	}
 
 	// filter client name
 	if clientName != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereClient := " and MCL_NAME like ''%" + clientName + "%'' "
 		queryFinal = queryFinal + whereClient
 	}
 
 	// filter sumbis
 	if businessSource != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
-
 		whereBusinessSource := " and (MA.NAMALEADER0 like ''%" + businessSource + "%'' OR " +
 			"MA.NAMALEADER1 like ''%" + businessSource + "%'' OR " +
 			"MA.NAMALEADER2 like ''%" + businessSource + "%'' OR " + 
@@ -296,14 +248,6 @@ func ProductionLt(c *gin.Context) {
 
 	// filter branch
 	if branch != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
-				"status":  400,
-				"data":    "",
-				"message": "Failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereBranch := " and (LC.KANWIL LIKE ''%" + branch + "%'' OR " + 
 			"LC.CABANG LIKE ''%" + branch + "%'' OR "+
 			"LC.PERWAKILAN LIKE ''%" + branch + "%'' OR "+

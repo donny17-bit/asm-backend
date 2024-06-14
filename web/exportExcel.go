@@ -123,6 +123,16 @@ func ExportProdLt(c *gin.Context) {
 	}
 	defer db.Close()
 
+	// field begin & end date harus di isi
+	if beginDate == "" || endDate == "" {
+		c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+			"status":  400,
+			"data":    "",
+			"message": "Failed get data, please provide valid date periode",
+		})
+		return
+	}
+
 	// get query
 	var queryFinal string
 	query := "exec SP_DETAIL_PRODUCTION_LONGTERM " + " "
@@ -146,29 +156,12 @@ func ExportProdLt(c *gin.Context) {
 
 	// filter bisnis
 	if business != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereBusiness := " and (LBU_NOTE like ''%" + business + "%'' OR LGB_NOTE like ''%" + business + "%'') "
 		queryFinal = queryFinal + whereBusiness
 	}
 
 	// filter sumbis
 	if businessSource != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
-
 		whereBusinessSource := " and (MA.NAMALEADER0 like ''%" + businessSource + "%'' OR " +
 			"MA.NAMALEADER1 like ''%" + businessSource + "%'' OR " +
 			"MA.NAMALEADER2 like ''%" + businessSource + "%'' OR " +
@@ -178,14 +171,6 @@ func ExportProdLt(c *gin.Context) {
 
 	// filter branch
 	if branch != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
-				"status":  400,
-				"data":    "",
-				"message": "Failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereBranch := " and (LC.KANWIL LIKE ''%" + branch + "%'' OR " + 
 			"LC.CABANG LIKE ''%" + branch + "%'' OR "+
 			"LC.PERWAKILAN LIKE ''%" + branch + "%'' OR "+

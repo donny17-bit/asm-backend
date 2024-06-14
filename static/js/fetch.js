@@ -9,9 +9,9 @@ document
     const no_polis = document.getElementById("no_polis").value; //include
     const no_cif = document.getElementById("no_cif").value; // include
     const client_name = document.getElementById("client_name").value; // include
-    const branch = document.getElementById("branch").value;
+    const branch = document.getElementById("branch").value; // include
     const business = document.getElementById("business").value; // include
-    const sumbis = document.getElementById("sumbis").value;
+    const sumbis = document.getElementById("sumbis").value; // include
 
     // Call the API (assuming a POST request)
     fetch("/api/production-longterm", {
@@ -34,7 +34,6 @@ document
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("status :", data.status);
         if (data.status === 400) {
           alert(data.message);
           return;
