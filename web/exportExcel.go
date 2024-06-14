@@ -33,14 +33,12 @@ func toAlphaString(n int) string {
 
 
 type InputData struct {
-	Page string `json:"page"`
-	Page_size string `json:"page_size"`
 	Begin_date string `json:"begin_date"`
 	End_date string `json:"end_date"`
 	No_polis string `json:"no_polis"`
 	No_cif string `json:"no_cif"`
-	Client_name string `json:"Client_name"`
-	Branch string `json:"Branch"`
+	Client_name string `json:"client_name"`
+	Branch string `json:"branch"`
 	Business string `json:"business"`
 	Sumbis string `json:"sumbis"`
 }
@@ -85,15 +83,13 @@ func ExportProdLt(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("masuk 1")
-
 	var inputData InputData
 	if err := c.BindJSON(&inputData); err != nil {
+		fmt.Println("error : ", err.Error())
+
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
-
-	fmt.Println("masuk 2")
 
 	// cek jika ldc_id ada di request
 	var ldc_id_param string
@@ -104,8 +100,8 @@ func ExportProdLt(c *gin.Context) {
 		ldc_id_param = c.PostForm("ldc_id")
 	}
 
-	page := c.Query("page")          // req
-	pageSize := c.Query("page_size") // req
+	page := "0"        // req
+	pageSize := "0" // req
 	sort := "asc"          // opt
 	order := "thnbln, client_name"        // req
 	noPolis := c.Query("no_polis")

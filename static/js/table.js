@@ -1,6 +1,9 @@
 function table(data) {
   console.log(data);
   const totalData = document.getElementById("total_data");
+  const table = document.getElementById("tableContainer");
+  table.style.height = "500px";
+  table.style.overflow = "visible";
   totalData.textContent = data.total_data;
 
   const tableBody = document.querySelector("#dataTable tbody");

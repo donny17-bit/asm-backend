@@ -53,12 +53,12 @@ func ProductionLt(c *gin.Context) {
 	page := inputData.Page          // req
 	pageSize := inputData.Page_size    // req
 	sort := "asc"        // opt
-	order := "thnbln, client_name"        // req
-	noPolis := c.PostForm("no_polis")
+	order := "thnbln, client_name"        // order default (req)
+	noPolis := inputData.No_polis
 	beginDate := inputData.Begin_date
 	endDate := inputData.End_date
-	business := c.PostForm("business")
-	clientName := c.PostForm("client_name")
+	business := inputData.Business
+	clientName := inputData.Client_name
 
 	var formatedBeginDate string
 	var formatedEndDate string

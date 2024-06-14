@@ -3,14 +3,14 @@ document
   .addEventListener("submit", function (event) {
     event.preventDefault();
 
-    const page_size = document.getElementById("page_size").value;
-    const begin_date = document.getElementById("begin_date").value;
-    const end_date = document.getElementById("end_date").value;
-    const no_polis = document.getElementById("no_polis").value;
+    const page_size = document.getElementById("page_size").value; //inlcude
+    const begin_date = document.getElementById("begin_date").value; //include
+    const end_date = document.getElementById("end_date").value; //include
+    const no_polis = document.getElementById("no_polis").value; //include
     const no_cif = document.getElementById("no_cif").value;
-    const client_name = document.getElementById("client_name").value;
+    const client_name = document.getElementById("client_name").value; // include
     const branch = document.getElementById("branch").value;
-    const business = document.getElementById("business").value;
+    const business = document.getElementById("business").value; // include
     const sumbis = document.getElementById("sumbis").value;
 
     // Call the API (assuming a POST request)
@@ -333,8 +333,6 @@ document.getElementById("export").addEventListener("click", function (event) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      page: "",
-      page_size: page_size,
       begin_date: begin_date,
       end_date: end_date,
       no_polis: no_polis,
@@ -346,11 +344,26 @@ document.getElementById("export").addEventListener("click", function (event) {
     }),
   })
     .then((response) => {
-      console.log(response.blob());
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
       return response.blob();
     })
     .then((blob) => {
-      console.log("blob : ", blob);
+      // Create a link element
+      const link = document.createElement("a");
+
+      // Create a URL for the Blob
+      const url = window.URL.createObjectURL(blob);
+      link.href = url;
+      link.download = "Detail_Produksi_Longterm.xlsx";
+
+      // Append the link to the body
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     })
     .catch((error) => console.error("Error:", error));
 });
