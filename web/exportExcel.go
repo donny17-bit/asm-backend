@@ -31,19 +31,18 @@ func toAlphaString(n int) string {
 	return result
 }
 
-
 type InputData struct {
-	Begin_date string `json:"begin_date"`
-	End_date string `json:"end_date"`
-	No_polis string `json:"no_polis"`
-	No_cif string `json:"no_cif"`
+	Begin_date  string `json:"begin_date"`
+	End_date    string `json:"end_date"`
+	No_polis    string `json:"no_polis"`
+	No_cif      string `json:"no_cif"`
 	Client_name string `json:"client_name"`
-	Branch string `json:"branch"`
-	Business string `json:"business"`
-	Sumbis string `json:"sumbis"`
+	Branch      string `json:"branch"`
+	Business    string `json:"business"`
+	Sumbis      string `json:"sumbis"`
 }
 
-func ExportProdLt(c *gin.Context) {	
+func ExportProdLt(c *gin.Context) {
 	err := godotenv.Load()
 
 	if err != nil {
@@ -88,8 +87,8 @@ func ExportProdLt(c *gin.Context) {
 		fmt.Println("error : ", err.Error())
 
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+		return
+	}
 
 	// cek jika ldc_id ada di request
 	var ldc_id_param string
@@ -100,15 +99,17 @@ func ExportProdLt(c *gin.Context) {
 		ldc_id_param = c.PostForm("ldc_id")
 	}
 
-	page := "0"        // req
-	pageSize := "0" // req
-	sort := "asc"          // opt
-	order := "thnbln, client_name"        // req
-	noPolis := c.Query("no_polis")
+	page := "0"                    // req
+	pageSize := "0"                // req
+	sort := "asc"                  // opt
+	order := "thnbln, client_name" // req
+	noPolis := inputData.No_polis
+	noCif := inputData.No_cif
 	beginDate := inputData.Begin_date
 	endDate := inputData.End_date
-	business := c.Query("business")
-
+	business := inputData.Business
+	businessSource := inputData.Sumbis
+	branch := inputData.Branch
 
 	if sort == "" {
 		sort = "asc"
@@ -126,11 +127,19 @@ func ExportProdLt(c *gin.Context) {
 	var queryFinal string
 	query := "exec SP_DETAIL_PRODUCTION_LONGTERM " + " "
 	where := "'" + order + "', '" + sort + "', '" + page + "', '" + pageSize + "', 'where a.ldc_id = ''" + ldc_id_param + "''" + " "
-	
+
 	// filter polis
 	if noPolis != "" {
 		andPolis := " and no_polis in (''" + noPolis + "'','''')"
 		queryFinal = query + where + andPolis
+	} else {
+		queryFinal = query + where
+	}
+
+	// filter polis
+	if noCif != "" {
+		andCif := " and no_cif in (''" + noCif + "'','''')"
+		queryFinal = query + where + andCif
 	} else {
 		queryFinal = query + where
 	}
@@ -145,8 +154,43 @@ func ExportProdLt(c *gin.Context) {
 			})
 			return
 		}
-		whereBusiness := " and LBU_NOTE like ''%" + business + "%'' "
+		whereBusiness := " and (LBU_NOTE like ''%" + business + "%'' OR LGB_NOTE like ''%" + business + "%'') "
 		queryFinal = queryFinal + whereBusiness
+	}
+
+	// filter sumbis
+	if businessSource != "" {
+		if beginDate == "" || endDate == "" {
+			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+				"status":  400,
+				"data":    "",
+				"message": "failed get data, please provide valid date periode",
+			})
+			return
+		}
+
+		whereBusinessSource := " and (MA.NAMALEADER0 like ''%" + businessSource + "%'' OR " +
+			"MA.NAMALEADER1 like ''%" + businessSource + "%'' OR " +
+			"MA.NAMALEADER2 like ''%" + businessSource + "%'' OR " +
+			"MA.NAMALEADER3 like ''%" + businessSource + "%'') "
+		queryFinal = queryFinal + whereBusinessSource
+	}
+
+	// filter branch
+	if branch != "" {
+		if beginDate == "" || endDate == "" {
+			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+				"status":  400,
+				"data":    "",
+				"message": "Failed get data, please provide valid date periode",
+			})
+			return
+		}
+		whereBranch := " and (LC.KANWIL LIKE ''%" + branch + "%'' OR " + 
+			"LC.CABANG LIKE ''%" + branch + "%'' OR "+
+			"LC.PERWAKILAN LIKE ''%" + branch + "%'' OR "+
+			"LC.SUB_PERWAKILAN LIKE ''%" + branch + "%'') "
+		queryFinal = queryFinal + whereBranch
 	}
 
 	// filter tgl
@@ -158,10 +202,10 @@ func ExportProdLt(c *gin.Context) {
 		// change date format
 		parsedBeginDate, err := time.Parse("2006-01-02", beginDate)
 		parsedEndDate, err := time.Parse("2006-01-02", endDate)
-    	if err != nil {
-        	fmt.Println("Error parsing date:", err)
-        	return
-    	}
+		if err != nil {
+			fmt.Println("Error parsing date:", err)
+			return
+		}
 
 		formatedBeginDate := parsedBeginDate.Format("20060102")
 		formatedEndDate := parsedEndDate.Format("20060102")

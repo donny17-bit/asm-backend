@@ -13,18 +13,17 @@ import (
 )
 
 type InputData struct {
-	Page string `json:"page"`
-	Page_size string `json:"page_size"`
-	Begin_date string `json:"begin_date"`
-	End_date string `json:"end_date"`
-	No_polis string `json:"no_polis"`
-	No_cif string `json:"no_cif"`
+	Page        string `json:"page"`
+	Page_size   string `json:"page_size"`
+	Begin_date  string `json:"begin_date"`
+	End_date    string `json:"end_date"`
+	No_polis    string `json:"no_polis"`
+	No_cif      string `json:"no_cif"`
 	Client_name string `json:"Client_name"`
-	Branch string `json:"Branch"`
-	Business string `json:"business"`
-	Sumbis string `json:"sumbis"`
+	Branch      string `json:"Branch"`
+	Business    string `json:"business"`
+	Sumbis      string `json:"sumbis"`
 }
-
 
 func ProductionLt(c *gin.Context) {
 	session := sessions.Default(c)
@@ -38,8 +37,8 @@ func ProductionLt(c *gin.Context) {
 	var inputData InputData
 	if err := c.BindJSON(&inputData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+		return
+	}
 
 	// // cek jika ldc_id ada di request
 	var ldc_id_param string
@@ -51,20 +50,24 @@ func ProductionLt(c *gin.Context) {
 	}
 
 	page := inputData.Page          // req
-	pageSize := inputData.Page_size    // req
-	sort := "asc"        // opt
-	order := "thnbln, client_name"        // order default (req)
+	pageSize := inputData.Page_size // req
+	sort := "asc"                   // opt
+	order := "thnbln, client_name"  // order default (req)
 	noPolis := inputData.No_polis
+	noCif := inputData.No_cif
 	beginDate := inputData.Begin_date
 	endDate := inputData.End_date
 	business := inputData.Business
+	businessSource := inputData.Sumbis
 	clientName := inputData.Client_name
+	branch := inputData.Branch
 
 	var formatedBeginDate string
 	var formatedEndDate string
 
 	fmt.Println("ldc_id_param", ldc_id_param)
 	fmt.Println("noPolis", noPolis)
+	fmt.Println("noCif", noCif)
 	fmt.Println("beginDate", beginDate)
 	fmt.Println("endDate", endDate)
 	fmt.Println("business", business)
@@ -95,6 +98,14 @@ func ProductionLt(c *gin.Context) {
 		queryRow = queryTotalRow + whereRow
 	}
 
+	// filter no cif
+	if noCif != "" {
+		andCif := " and no_cif in ('" + noCif + "','') "
+		queryRow = queryTotalRow + whereRow + andCif
+	} else {
+		queryRow = queryTotalRow + whereRow
+	}
+
 	// filter bisnis
 	if business != "" {
 		if beginDate == "" || endDate == "" {
@@ -105,7 +116,7 @@ func ProductionLt(c *gin.Context) {
 			})
 			return
 		}
-		whereBusiness := " and LBU_NOTE like '%" + business + "%' "
+		whereBusiness := " and (LBU_NOTE like '%" + business + "%' OR LGB_NOTE like '%" + business + "%') "
 		queryRow = queryRow + whereBusiness
 	}
 
@@ -123,16 +134,50 @@ func ProductionLt(c *gin.Context) {
 		queryRow = queryRow + whereClient
 	}
 
+	// filter sumbis
+	if businessSource != "" {
+		if beginDate == "" || endDate == "" {
+			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+				"status":  400,
+				"data":    "",
+				"message": "failed get data, please provide valid date periode",
+			})
+			return
+		}
+		whereBusinessSource := " and (MA.NAMALEADER0 like '%" + businessSource + "%' OR " +
+			"MA.NAMALEADER1 like '%" + businessSource + "%' OR " +
+			"MA.NAMALEADER2 like '%" + businessSource + "%' OR " + 
+			"MA.NAMALEADER3 like '%" + businessSource + "%') "
+		queryRow = queryRow + whereBusinessSource
+	}
+
+	// filter branch
+	if branch != "" {
+		if beginDate == "" || endDate == "" {
+			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+				"status":  400,
+				"data":    "",
+				"message": "failed get data, please provide valid date periode",
+			})
+			return
+		}
+		whereBranch := " and (LC.KANWIL LIKE '%" + branch + "%' OR " + 
+			"LC.CABANG LIKE '%" + branch + "%' OR "+
+			"LC.PERWAKILAN LIKE '%" + branch + "%' OR "+
+			"LC.SUB_PERWAKILAN LIKE '%" + branch + "%') "
+		queryRow = queryRow + whereBranch
+	}
+
 	// filter tgl
 	if beginDate != "" && endDate != "" {
 
 		// change date format
 		parsedBeginDate, err := time.Parse("2006-01-02", beginDate)
 		parsedEndDate, err := time.Parse("2006-01-02", endDate)
-    	if err != nil {
-        	fmt.Println("Error parsing date:", err)
-        	return
-    	}
+		if err != nil {
+			fmt.Println("Error parsing date:", err)
+			return
+		}
 
 		formatedBeginDate = parsedBeginDate.Format("20060102")
 		formatedEndDate = parsedEndDate.Format("20060102")
@@ -140,6 +185,8 @@ func ProductionLt(c *gin.Context) {
 		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between  '" + formatedBeginDate + "' and '" + formatedEndDate + "' "
 		queryRow = queryRow + whereDate
 	}
+
+	fmt.Println("queryRow row : ", queryRow)
 
 	countRows, err := db.Query(queryRow)
 
@@ -180,7 +227,6 @@ func ProductionLt(c *gin.Context) {
 	// end count rows
 	// ------------------------------------------------------------------------------------------------------------
 
-
 	// get query
 	var queryFinal string
 	query := "exec SP_DETAIL_PRODUCTION_LONGTERM " + " "
@@ -194,6 +240,14 @@ func ProductionLt(c *gin.Context) {
 		queryFinal = query + where
 	}
 
+	// filter no cif
+	if noCif != "" {
+		andCif := " and no_cif in (''" + noCif + "'','''')"
+		queryFinal = query + where + andCif
+	} else {
+		queryRow = queryTotalRow + whereRow
+	}
+
 	// filter bisnis
 	if business != "" {
 		if beginDate == "" || endDate == "" {
@@ -204,7 +258,7 @@ func ProductionLt(c *gin.Context) {
 			})
 			return
 		}
-		whereBusiness := " and LBU_NOTE like ''%" + business + "%'' "
+		whereBusiness := " and (LBU_NOTE like ''%" + business + "%'' OR LGB_NOTE like ''%" + business + "%'') "
 		queryFinal = queryFinal + whereBusiness
 	}
 
@@ -222,6 +276,42 @@ func ProductionLt(c *gin.Context) {
 		queryFinal = queryFinal + whereClient
 	}
 
+	// filter sumbis
+	if businessSource != "" {
+		if beginDate == "" || endDate == "" {
+			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+				"status":  400,
+				"data":    "",
+				"message": "failed get data, please provide valid date periode",
+			})
+			return
+		}
+
+		whereBusinessSource := " and (MA.NAMALEADER0 like ''%" + businessSource + "%'' OR " +
+			"MA.NAMALEADER1 like ''%" + businessSource + "%'' OR " +
+			"MA.NAMALEADER2 like ''%" + businessSource + "%'' OR " + 
+			"MA.NAMALEADER3 like ''%" + businessSource + "%'') "
+		queryFinal = queryFinal + whereBusinessSource
+	}
+
+	// filter branch
+	if branch != "" {
+		if beginDate == "" || endDate == "" {
+			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+				"status":  400,
+				"data":    "",
+				"message": "Failed get data, please provide valid date periode",
+			})
+			return
+		}
+		whereBranch := " and (LC.KANWIL LIKE ''%" + branch + "%'' OR " + 
+			"LC.CABANG LIKE ''%" + branch + "%'' OR "+
+			"LC.PERWAKILAN LIKE ''%" + branch + "%'' OR "+
+			"LC.SUB_PERWAKILAN LIKE ''%" + branch + "%'') "
+		queryFinal = queryFinal + whereBranch
+	}
+
+
 	// filter tgl
 	if beginDate != "" && endDate != "" {
 		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between ''" + formatedBeginDate + "'' and ''" + formatedEndDate + "'' "
@@ -230,7 +320,7 @@ func ProductionLt(c *gin.Context) {
 
 	queryFinal = queryFinal + "'"
 
-	fmt.Println("queryFinal : ", queryFinal)
+	fmt.Println("queryFinal get : ", queryFinal)
 	// nnti tambhain klau yg login nik itasm, keluarin semua
 	rows, err := db.Query(queryFinal)
 
@@ -352,6 +442,8 @@ func ProductionLt(c *gin.Context) {
 		return
 	}
 
+	// --------- end tarik data from sql ----------
+
 	pageNum, err := strconv.Atoi(page)
 	// if err != nil {
 	// 	// Handle error
@@ -366,7 +458,6 @@ func ProductionLt(c *gin.Context) {
 	}
 
 	previousPage := pageNum - 1
-
 
 	// "data"	: datas, this is array object type
 
@@ -405,5 +496,5 @@ func ProductionLt(c *gin.Context) {
 		"total_data":    totalRows,
 		"message":       "success get data",
 	})
-	
+
 }

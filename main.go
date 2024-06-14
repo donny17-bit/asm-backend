@@ -65,7 +65,7 @@ func main() {
 	router.POST("/api/production-longterm", production.ProductionLt)
 	router.GET("/api/production-longterm", production.ProductionLt)
 	router.GET("/api/production-yearly", production.GetProductionYr)
-	
+
 	router.POST("/api/export-production-longterm", web.ExportProdLt)
 	// router.GET("/api/export-production-longterm", web.ExportProdLt)
 

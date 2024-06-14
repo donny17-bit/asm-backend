@@ -7,7 +7,7 @@ document
     const begin_date = document.getElementById("begin_date").value; //include
     const end_date = document.getElementById("end_date").value; //include
     const no_polis = document.getElementById("no_polis").value; //include
-    const no_cif = document.getElementById("no_cif").value;
+    const no_cif = document.getElementById("no_cif").value; // include
     const client_name = document.getElementById("client_name").value; // include
     const branch = document.getElementById("branch").value;
     const business = document.getElementById("business").value; // include
@@ -34,13 +34,21 @@ document
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("status :", data.status);
+        if (data.status === 400) {
+          alert(data.message);
+          return;
+        }
+
         // table
         table(data);
 
         // pagination script
         pagination(data);
       })
-      .catch((error) => console.error("Error:", error));
+      .catch((error) => {
+        return console.error("Error:", error);
+      });
   });
 
 document

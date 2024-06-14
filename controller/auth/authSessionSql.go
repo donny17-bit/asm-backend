@@ -15,29 +15,28 @@ func LoginSessionSql(c *gin.Context) {
 	// work on next js
 	// var data map[string]interface{}
 
-    // err := c.BindJSON(&data)
-    // if err != nil {
-    //     // Handle error
-    //     return
-    // }
+	// err := c.BindJSON(&data)
+	// if err != nil {
+	//     // Handle error
+	//     return
+	// }
 
 	// // Now you can access the fields from the JSON data
-    // nik, okNik := data["nik"].(string)
-    // if !okNik {
-    //     // "nik" field not found or not a string
-    //     // Handle error
+	// nik, okNik := data["nik"].(string)
+	// if !okNik {
+	//     // "nik" field not found or not a string
+	//     // Handle error
 	// 	fmt.Println("nik not found in request body")
-    //     return
-    // }
+	//     return
+	// }
 
 	// password, okPass := data["password"].(string)
-    // if !okPass {
-    //     // "nik" field not found or not a string
-    //     // Handle error
+	// if !okPass {
+	//     // "nik" field not found or not a string
+	//     // Handle error
 	// 	fmt.Println("password not found in request body")
-    //     return
-    // }
-
+	//     return
+	// }
 
 	// work on postman
 	nik := c.PostForm("nik")
@@ -61,14 +60,14 @@ func LoginSessionSql(c *gin.Context) {
 	db, err := model.SqlModel()
 
 	if err != nil {
-		fmt.Println("error connectiong to database : ",err)
+		fmt.Println("error connectiong to database : ", err)
 		return
 	}
 
 	defer db.Close()
 
 	// Execute a query
-	query := "SELECT NIK, PASS_ID, CAST(TGL_AKHIR AS DATE) as tgl_akhir, LDI_ID, CAB_ID FROM LST_USER_ASURANSI WHERE NIK = '"+nik+"' AND PASS_ID = '"+password+"' AND STS_AKTIF = '1'"
+	query := "SELECT NIK, PASS_ID, CAST(TGL_AKHIR AS DATE) as tgl_akhir, LDI_ID, CAB_ID FROM LST_USER_ASURANSI WHERE NIK = '" + nik + "' AND PASS_ID = '" + password + "' AND STS_AKTIF = '1'"
 	rows, err := db.Query(query)
 
 	fmt.Println(query)
@@ -123,7 +122,7 @@ func LoginSessionSql(c *gin.Context) {
 		session.Options(sessions.Options{
 			MaxAge: 1800, // 30 minutes
 			// MaxAge: 60, // for testing
-			
+
 			// HttpOnly: true,
 		})
 		session.Save()
@@ -132,7 +131,7 @@ func LoginSessionSql(c *gin.Context) {
 
 		// save it to db sql
 		// Execute a query
-		query := "INSERT INTO LS_SESSION VALUES('" + id + "', '" + nik + "', '"+lastActivityString+"', '" + expirationString + "')"
+		query := "INSERT INTO LS_SESSION VALUES('" + id + "', '" + nik + "', '" + lastActivityString + "', '" + expirationString + "')"
 		_, err := db.Exec(query)
 
 		if err != nil {
@@ -142,7 +141,6 @@ func LoginSessionSql(c *gin.Context) {
 
 		// Set session data as a cookie in the HTTP response
 		// c.SetCookie("session", id, 1800, "/", "", false, false) // SetCookie(name, value, maxAge, path, domain, secure, httpOnly)
-
 
 		c.JSON(http.StatusOK, gin.H{
 			"status":  200,
@@ -204,13 +202,13 @@ func IsActiveSql(c *gin.Context) bool {
 
 	db, err := model.SqlModel()
 	if err != nil {
-		fmt.Println("error connectiong to database : ",err)
+		fmt.Println("error connectiong to database : ", err)
 		return false
 	}
 
 	defer db.Close()
 
-	query := "SELECT * FROM LS_SESSION WHERE USER_ID = '"+nik.(string)+"' and SESSION_ID = '"+id.(string)+"'"
+	query := "SELECT * FROM LS_SESSION WHERE USER_ID = '" + nik.(string) + "' and SESSION_ID = '" + id.(string) + "'"
 	result, err := db.Query(query)
 
 	// kalau error di query or user_id/session id ga ada di db
@@ -253,13 +251,11 @@ func IsActiveSql(c *gin.Context) bool {
 	lastActivityNew := time.Now()
 	lastActivityString := lastActivityNew.String()
 	expirationNew := time.Now().Add(30 * time.Minute)
-	
+
 	// for testing only
 	// expirationNew := time.Now().Add(1 * time.Minute)
 
 	expirationString := expirationNew.String()
-
-	
 
 	// update session cookie
 	session.Set("lastActivity", lastActivityNew.Unix())

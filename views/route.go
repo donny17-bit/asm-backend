@@ -68,7 +68,7 @@ func GetDashboard(c *gin.Context) {
 }
 
 func GetProduction(c *gin.Context) {
-	
+
 	c.HTML(http.StatusOK, "production.html", nil)
 }
 
