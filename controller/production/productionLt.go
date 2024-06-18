@@ -84,24 +84,21 @@ func ProductionLt(c *gin.Context) {
 	}
 
 	// cek total row ----------------------------------------------------------------
-	var queryRow string
-	queryTotalRow := "select count(1) as total_rows FROM PRODUCTION_GABUNGAN_VIEW A JOIN MV_AGEN MA ON A.LAG_ID = MA.LAG_AGEN_ID JOIN LST_CABANG LC ON A.LDC_ID = LC.LDC_ID JOIN LST_BUSINESS LB ON A.LBU_ID = LB.LBU_ID JOIN LST_GRP_BUSINESS LGB ON LB.LGB_ID = LGB.LGB_ID JOIN LST_JN_PRODUKSI LJP ON LJP.LJP_ID = A.LJP_ID JOIN JNNER JNN ON JNN.JN_NER = A.JN_NER LEFT OUTER JOIN LST_MO MO ON A.LMO_ID = MO.LMO_ID LEFT OUTER JOIN MST_CLIENT MC ON A.CLIENT_ID = MC.MCL_ID LEFT OUTER JOIN LST_JENIS_COAS JN_COAS ON A.MDS_JN_COAS = JN_COAS.MDS_JN_COAS "
+	queryRow := "select count(1) as total_rows FROM PRODUCTION_GABUNGAN_VIEW A JOIN MV_AGEN MA ON A.LAG_ID = MA.LAG_AGEN_ID JOIN LST_CABANG LC ON A.LDC_ID = LC.LDC_ID JOIN LST_BUSINESS LB ON A.LBU_ID = LB.LBU_ID JOIN LST_GRP_BUSINESS LGB ON LB.LGB_ID = LGB.LGB_ID JOIN LST_JN_PRODUKSI LJP ON LJP.LJP_ID = A.LJP_ID JOIN JNNER JNN ON JNN.JN_NER = A.JN_NER LEFT OUTER JOIN LST_MO MO ON A.LMO_ID = MO.LMO_ID LEFT OUTER JOIN MST_CLIENT MC ON A.CLIENT_ID = MC.MCL_ID LEFT OUTER JOIN LST_JENIS_COAS JN_COAS ON A.MDS_JN_COAS = JN_COAS.MDS_JN_COAS "
 	whereRow := "where a.ldc_id = '" + ldc_id_param + "' "
+
+	queryRow = queryRow + whereRow
 
 	// filter polis
 	if noPolis != "" {
 		andPolis := " and no_polis in ('" + noPolis + "','') "
-		queryRow = queryTotalRow + whereRow + andPolis
-	} else {
-		queryRow = queryTotalRow + whereRow
+		queryRow = queryRow + andPolis
 	}
 
 	// filter no cif
 	if noCif != "" {
 		andCif := " and no_cif in ('" + noCif + "','') "
-		queryRow = queryTotalRow + whereRow + andCif
-	} else {
-		queryRow = queryTotalRow + whereRow
+		queryRow = queryRow + andCif
 	}
 
 	// filter bisnis
@@ -193,24 +190,22 @@ func ProductionLt(c *gin.Context) {
 	// ------------------------------------------------------------------------------------------------------------
 
 	// get query
-	var queryFinal string
-	query := "exec SP_DETAIL_PRODUCTION_LONGTERM " + " "
+	// var queryFinal string
+	queryFinal := "exec SP_DETAIL_PRODUCTION_LONGTERM " + " "
 	where := "'" + order + "', '" + sort + "', '" + page + "', '" + pageSize + "', 'where a.ldc_id = ''" + ldc_id_param + "''" + " "
+
+	queryFinal = queryFinal + where
 
 	// filter polis
 	if noPolis != "" {
 		andPolis := " and no_polis in (''" + noPolis + "'','''')"
-		queryFinal = query + where + andPolis
-	} else {
-		queryFinal = query + where
+		queryFinal = queryFinal + andPolis
 	}
 
 	// filter no cif
 	if noCif != "" {
 		andCif := " and no_cif in (''" + noCif + "'','''')"
-		queryFinal = query + where + andCif
-	} else {
-		queryRow = queryTotalRow + whereRow
+		queryFinal = queryFinal + andCif
 	}
 
 	// filter bisnis

@@ -1,13 +1,15 @@
 package production
 
 import (
-	"asm-backend/controller/auth"
+	// "asm-backend/controller/auth"
 	"asm-backend/model"
 	"fmt"
 	"math"
 	"net/http"
-	"os"
+
+	// "os"
 	"strconv"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -22,29 +24,30 @@ func ProductionYr(c *gin.Context) {
 		return
 	}
 
-	auth_server := os.Getenv("auth_server")
+	// SEMENTARA DIMATIKAN
+	// auth_server := os.Getenv("auth_server")
 
-	var ok bool
+	// var ok bool
 
-	if auth_server == "oracle" {
-		ok = auth.IsActive(c)
-	}
+	// if auth_server == "oracle" {
+	// 	ok = auth.IsActive(c)
+	// }
 
-	if auth_server == "sql" {
-		ok = auth.IsActiveSql(c)
-	}
+	// if auth_server == "sql" {
+	// 	ok = auth.IsActiveSql(c)
+	// }
 
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"data":           "",
-			"current_page: ": "",
-			"page_size":      "",
-			"max_page":       "",
-			"message":        "unauthorized",
-			"status":         401,
-		})
-		return
-	}
+	// if !ok {
+	// 	c.JSON(http.StatusUnauthorized, gin.H{
+	// 		"data":           "",
+	// 		"current_page: ": "",
+	// 		"page_size":      "",
+	// 		"max_page":       "",
+	// 		"message":        "unauthorized",
+	// 		"status":         401,
+	// 	})
+	// 	return
+	// }
 
 	session := sessions.Default(c)
 	ldc_id := session.Get("ldc_id") // default sesuai info login
@@ -54,24 +57,45 @@ func ProductionYr(c *gin.Context) {
 		return
 	}
 
+	var inputData InputData
+	if err := c.BindJSON(&inputData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	// cek jika ldc_id ada di request
 	var ldc_id_param string
 
 	if c.Query("ldc_id") == "" {
 		ldc_id_param = ldc_id.(string)
 	} else {
-		ldc_id_param = c.Query("ldc_id")
+		ldc_id_param = c.PostForm("ldc_id")
 	}
 
-	page := c.Query("page")          // req
-	pageSize := c.Query("page_size") // req
-	sort := c.Query("sort")          // opt
-	order := c.Query("order")        // req
-	noPolis := c.Query("no_polis")
-	beginDate := c.Query("begin_date")
-	endDate := c.Query("end_date")
-	business := c.Query("business")
-	clientName := c.Query("client_name")
+	
+	page := inputData.Page          // req
+	pageSize := inputData.Page_size // req
+	sort := "asc"                   // opt
+	order := "thnbln, client_name"  // order default (req)
+	noPolis := inputData.No_polis
+	noCif := inputData.No_cif
+	beginDate := inputData.Begin_date
+	endDate := inputData.End_date
+	business := inputData.Business
+	businessSource := inputData.Sumbis
+	clientName := inputData.Client_name
+	branch := inputData.Branch
+
+	var formatedBeginDate string
+	var formatedEndDate string
+
+	fmt.Println("ldc_id_param", ldc_id_param)
+	fmt.Println("noPolis", noPolis)
+	fmt.Println("noCif", noCif)
+	fmt.Println("beginDate", beginDate)
+	fmt.Println("endDate", endDate)
+	fmt.Println("business", business)
+	fmt.Println("clientName", clientName)	
 
 	if sort == "" {
 		sort = "asc"
@@ -85,52 +109,84 @@ func ProductionYr(c *gin.Context) {
 	}
 	defer db.Close()
 
+	// field begin date & end date harus di isi
+	if beginDate == "" || endDate == "" {
+		c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+			"status":  400,
+			"data":    "",
+			"message": "Failed get data, please provide valid date periode",
+		})
+		return
+	}
+	
 	// cek total row ------------------
-	var queryRow string
-	queryTotalRow := "select count(1) as total_rows FROM PRODUCTION_TAHUNAN_ACC_GABUNGAN_VIEW A JOIN MV_AGEN MA ON A.LAG_ID = MA.LAG_AGEN_ID JOIN LST_CABANG LC ON A.LDC_ID = LC.LDC_ID JOIN LST_BUSINESS LB ON A.LBU_ID = LB.LBU_ID JOIN LST_GRP_BUSINESS LGB ON LB.LGB_ID = LGB.LGB_ID JOIN LST_JN_PRODUKSI LJP ON LJP.LJP_ID = A.LJP_ID JOIN JNNER JNN ON JNN.JN_NER = A.JN_NER LEFT OUTER JOIN LST_MO MO ON A.LMO_ID = MO.LMO_ID LEFT OUTER JOIN MST_CLIENT MC ON A.CLIENT_ID = MC.MCL_ID LEFT OUTER JOIN LST_JENIS_COAS JN_COAS ON A.MDS_JN_COAS = JN_COAS.MDS_JN_COAS "
+	// var queryRow string
+	queryRow := "select count(1) as total_rows FROM PRODUCTION_TAHUNAN_ACC_GABUNGAN_VIEW A JOIN MV_AGEN MA ON A.LAG_ID = MA.LAG_AGEN_ID JOIN LST_CABANG LC ON A.LDC_ID = LC.LDC_ID JOIN LST_BUSINESS LB ON A.LBU_ID = LB.LBU_ID JOIN LST_GRP_BUSINESS LGB ON LB.LGB_ID = LGB.LGB_ID JOIN LST_JN_PRODUKSI LJP ON LJP.LJP_ID = A.LJP_ID JOIN JNNER JNN ON JNN.JN_NER = A.JN_NER LEFT OUTER JOIN LST_MO MO ON A.LMO_ID = MO.LMO_ID LEFT OUTER JOIN MST_CLIENT MC ON A.CLIENT_ID = MC.MCL_ID LEFT OUTER JOIN LST_JENIS_COAS JN_COAS ON A.MDS_JN_COAS = JN_COAS.MDS_JN_COAS "
 	whereRow := "where a.ldc_id = '" + ldc_id_param + "' "
+
+	queryRow = queryRow + whereRow
 
 	// filter polis
 	if noPolis != "" {
 		andPolis := " and no_polis in ('" + noPolis + "','') "
-		queryRow = queryTotalRow + whereRow + andPolis
-	} else {
-		queryRow = queryTotalRow + whereRow
+		queryRow = queryRow + andPolis
+	}
+
+	// filter no cif
+	if noCif != "" {
+		andCif := " and no_cif in ('" + noCif + "','') "
+		queryRow = queryRow + andCif
 	}
 
 	// filter bisnis
 	if business != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereBusiness := " and LBU_NOTE like '%" + business + "%' "
 		queryRow = queryRow + whereBusiness
 	}
 
 	// filter client name
 	if clientName != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereClient := " and MC.MCL_NAME like '%" + clientName + "%' "
 		queryRow = queryRow + whereClient
 	}
 
+	// filter sumbis
+	if businessSource != "" {
+		whereBusinessSource := " and (MA.NAMALEADER0 like '%" + businessSource + "%' OR " +
+			"MA.NAMALEADER1 like '%" + businessSource + "%' OR " +
+			"MA.NAMALEADER2 like '%" + businessSource + "%' OR " + 
+			"MA.NAMALEADER3 like '%" + businessSource + "%') "
+		queryRow = queryRow + whereBusinessSource
+	}
+
+	// filter branch
+	if branch != "" {
+		whereBranch := " and (LC.KANWIL LIKE '%" + branch + "%' OR " + 
+			"LC.CABANG LIKE '%" + branch + "%' OR "+
+			"LC.PERWAKILAN LIKE '%" + branch + "%' OR "+
+			"LC.SUB_PERWAKILAN LIKE '%" + branch + "%') "
+		queryRow = queryRow + whereBranch
+	}
+
+
 	// filter tgl
 	if beginDate != "" && endDate != "" {
-		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between  '" + beginDate + "' and '" + endDate + "' "
+		// change date format
+		parsedBeginDate, err := time.Parse("2006-01-02", beginDate)
+		parsedEndDate, err := time.Parse("2006-01-02", endDate)
+		if err != nil {
+			fmt.Println("Error parsing date:", err)
+			return
+		}
+
+		formatedBeginDate = parsedBeginDate.Format("20060102")
+		formatedEndDate = parsedEndDate.Format("20060102")
+
+		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between  '" + formatedBeginDate + "' and '" + formatedEndDate + "' "
 		queryRow = queryRow + whereDate
 	}
+
+	fmt.Println("query row : ", queryRow)
 
 	countRows, err := db.Query(queryRow)
 
@@ -142,7 +198,6 @@ func ProductionYr(c *gin.Context) {
 	defer countRows.Close()
 
 	var totalRows int
-	// var totalPage float64
 
 	for countRows.Next() {
 		err := countRows.Scan(&totalRows)
@@ -161,58 +216,68 @@ func ProductionYr(c *gin.Context) {
 	totalPage := math.Ceil(float64(totalRows) / float64(pageSizeNum))
 	// totalPageFloat := float64(totalPage)
 
-	// end count rows
-	// -----------------
-
 	if err := countRows.Err(); err != nil {
 		fmt.Println("Error iterating count rows:", err)
 		return
 	}
 
+	// end count rows
+	// -----------------------------------------------------------------
+
 	// get query
-	var queryFinal string
-	query := "exec SP_DETAIL_PRODUCTION_YEAR " + " "
+	// var queryFinal string
+	queryFinal := "exec SP_DETAIL_PRODUCTION_YEAR " + " "
 	where := "'" + order + "', '" + sort + "', '" + page + "', '" + pageSize + "', 'where a.ldc_id = ''" + ldc_id_param + "''" + " "
+
+	queryFinal = queryFinal + where
 
 	// filter polis
 	if noPolis != "" {
 		andPolis := " and no_polis in (''" + noPolis + "'','''')"
-		queryFinal = query + where + andPolis
-	} else {
-		queryFinal = query + where
+		queryFinal = queryFinal + andPolis
+	}
+
+	// filter no cif
+	if noCif != "" {
+		andCif := " and no_cif in (''" + noCif + "'','''')"
+		queryFinal = queryFinal + andCif
 	}
 
 	// filter bisnis
 	if business != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereBusiness := " and LBU_NOTE like ''%" + business + "%'' "
 		queryFinal = queryFinal + whereBusiness
 	}
 
 	// filter client name
 	if clientName != "" {
-		if beginDate == "" || endDate == "" {
-			c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti
-				"status":  400,
-				"data":    "",
-				"message": "failed get data, please provide valid date periode",
-			})
-			return
-		}
 		whereClient := " and MCL_NAME like ''%" + clientName + "%'' "
 		queryFinal = queryFinal + whereClient
 	}
 
+	// filter sumbis
+	if businessSource != "" {
+		whereBusinessSource := " and (MA.NAMALEADER0 like ''%" + businessSource + "%'' OR " +
+			"MA.NAMALEADER1 like ''%" + businessSource + "%'' OR " +
+			"MA.NAMALEADER2 like ''%" + businessSource + "%'' OR " + 
+			"MA.NAMALEADER3 like ''%" + businessSource + "%'') "
+		queryFinal = queryFinal + whereBusinessSource
+	}
+
+
+	// filter branch
+	if branch != "" {
+		whereBranch := " and (LC.KANWIL LIKE ''%" + branch + "%'' OR " + 
+			"LC.CABANG LIKE ''%" + branch + "%'' OR "+
+			"LC.PERWAKILAN LIKE ''%" + branch + "%'' OR "+
+			"LC.SUB_PERWAKILAN LIKE ''%" + branch + "%'') "
+		queryFinal = queryFinal + whereBranch
+	}
+
+
 	// filter tgl
 	if beginDate != "" && endDate != "" {
-		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between ''" + beginDate + "'' and ''" + endDate + "'' "
+		whereDate := " and CAST(left(tgl_prod, 4) + right(TGL_PROD, 2) + left(right(TGL_PROD, 5), 2)  AS INT) between ''" + formatedBeginDate + "'' and ''" + formatedEndDate + "'' "
 		queryFinal = queryFinal + whereDate
 	}
 
@@ -228,50 +293,6 @@ func ProductionYr(c *gin.Context) {
 	}
 
 	defer rows.Close() // Close the result set when done
-
-	type Data struct {
-		Rn            string  `json:"Rn"`
-		TglProd       string  `json:"TglProd"`
-		ThnBln        string  `json:"ThnBln"`
-		ProdDate      string  `json:"ProdDate"`
-		BeginDate     string  `json:"BeginDate"`
-		EndDate       string  `json:"EndDate"`
-		Mo            string  `json:"Mo"`
-		ClientName    string  `json:"ClientName"`
-		Kanwil        string  `json:"Kanwil"`
-		Cabang        string  `json:"Cabang"`
-		Perwakilan    string  `json:"Perwakilan"`
-		SubPerwakilan string  `json:"SubPerwakilan"`
-		Jnner         string  `json:"Jnner"`
-		JenisProd     string  `json:"JenisProd"`
-		JenisPaket    *string `json:"JenisPaket"`
-		// JenisPaket    NullableString `json:"JenisPaket"`
-		Ket *string `json:"Ket"`
-		// NamaCeding    NullableString `json:"NamaCeding"`
-		NamaCeding    *string `json:"NamaCeding"`
-		Namaleader0   string  `json:"Namaleader0"`
-		Namaleader1   string  `json:"Namaleader1"`
-		Namaleader2   string  `json:"Namaleader2"`
-		Namaleader3   string  `json:"Namaleader3"`
-		GroupBusiness string  `json:"GroupBusiness"`
-		Business      string  `json:"Business"`
-		NoKontrak     *string `json:"NoKontrak"`
-		NoPolis       string  `json:"NoPolis"`
-		NoCif         string  `json:"NoCif"`
-		ProdKe        string  `json:"ProdKe"`
-		NamaDealer    *string `json:"NamaDealer"`
-		Tsi           float32 `json:"Tsi"`
-		Gpw           float32 `json:"Gpw"`
-		Disc          float32 `json:"Disc"`
-		Disc2         float32 `json:"Disc2"`
-		Comm          float32 `json:"Comm"`
-		Oc            float32 `json:"Oc"`
-		Bkp           float32 `json:"Bkp"`
-		Ngpw          float32 `json:"Ngpw"`
-		Ri            float32 `json:"Ri"`
-		Ricom         float32 `json:"Ricom"`
-		Npw           float32 `json:"Npw"`
-	}
 
 	// Create an array to store the query results
 	var datas []Data

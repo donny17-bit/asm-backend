@@ -15,7 +15,8 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func ExportProdLt(c *gin.Context) {
+
+func ExportProdYr(c *gin.Context) {
 	err := godotenv.Load()
 
 	if err != nil {
@@ -69,7 +70,7 @@ func ExportProdLt(c *gin.Context) {
 	if c.Query("ldc_id") == "" {
 		ldc_id_param = ldc_id.(string)
 	} else {
-		ldc_id_param = c.PostForm("ldc_id")
+		ldc_id_param = c.PostForm("ldc_id") // nnti diganti
 	}
 
 	page := "0"                    // req
@@ -107,24 +108,22 @@ func ExportProdLt(c *gin.Context) {
 	}
 
 	// get query
-	var queryFinal string
-	query := "exec SP_DETAIL_PRODUCTION_LONGTERM " + " "
+	// var queryFinal string
+	queryFinal := "exec SP_DETAIL_PRODUCTION_YEAR " + " "
 	where := "'" + order + "', '" + sort + "', '" + page + "', '" + pageSize + "', 'where a.ldc_id = ''" + ldc_id_param + "''" + " "
+
+	queryFinal = queryFinal + where
 
 	// filter polis
 	if noPolis != "" {
 		andPolis := " and no_polis in (''" + noPolis + "'','''')"
-		queryFinal = query + where + andPolis
-	} else {
-		queryFinal = query + where
+		queryFinal = queryFinal + andPolis
 	}
 
 	// filter polis
 	if noCif != "" {
 		andCif := " and no_cif in (''" + noCif + "'','''')"
-		queryFinal = query + where + andCif
-	} else {
-		queryFinal = query + where
+		queryFinal = queryFinal + andCif
 	}
 
 	// filter bisnis
@@ -218,7 +217,7 @@ func ExportProdLt(c *gin.Context) {
 	}
 
 	// Save the Excel file
-	tempFile := "Detail_Produksi_Longterm.xlsx" // Temporarily save the file
+	tempFile := "Detail_Produksi_Yearly.xlsx" // Temporarily save the file
 	if err := file.SaveAs(tempFile); err != nil {
 		fmt.Println(err)
 		c.String(http.StatusInternalServerError, "Internal Server Error")
@@ -227,7 +226,7 @@ func ExportProdLt(c *gin.Context) {
 
 	// Serve the Excel file as a response
 	defer os.Remove(tempFile) // Remove the file after serving
-	c.Header("Content-Disposition", "attachment; filename=Detail_Produksi_Longterm.xlsx")
+	c.Header("Content-Disposition", "attachment; filename=Detail_Produksi_Yearly.xlsx")
 	c.Header("Content-Type", "application/octet-stream")
 	c.File(tempFile)
 }

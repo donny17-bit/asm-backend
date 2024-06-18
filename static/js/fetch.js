@@ -69,8 +69,11 @@ document
     const business = document.getElementById("business").value;
     const sumbis = document.getElementById("sumbis").value;
 
+    const url = window.location.href;
+    const path = url.split("/").pop();
+
     // Call the API (assuming a POST request)
-    fetch("/api/production-longterm", {
+    fetch(`/api/${path}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -115,8 +118,11 @@ document
     const business = document.getElementById("business").value;
     const sumbis = document.getElementById("sumbis").value;
 
+    const url = window.location.href;
+    const path = url.split("/").pop();
+
     // Call the API (assuming a POST request)
-    fetch("/api/production-longterm", {
+    fetch(`/api/${path}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -160,8 +166,11 @@ document
     const business = document.getElementById("business").value;
     const sumbis = document.getElementById("sumbis").value;
 
+    const url = window.location.href;
+    const path = url.split("/").pop();
+
     // Call the API (assuming a POST request)
-    fetch("/api/production-longterm", {
+    fetch(`/api/${path}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -206,8 +215,11 @@ document
     const business = document.getElementById("business").value;
     const sumbis = document.getElementById("sumbis").value;
 
+    const url = window.location.href;
+    const path = url.split("/").pop();
+
     // Call the API (assuming a POST request)
-    fetch("/api/production-longterm", {
+    fetch(`/api/${path}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -250,8 +262,11 @@ document.getElementById("previous").addEventListener("click", function (event) {
   const business = document.getElementById("business").value;
   const sumbis = document.getElementById("sumbis").value;
 
+  const url = window.location.href;
+  const path = url.split("/").pop();
+
   // Call the API (assuming a POST request)
-  fetch("/api/production-longterm", {
+  fetch(`/api/${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -294,8 +309,11 @@ document.getElementById("next").addEventListener("click", function (event) {
   const business = document.getElementById("business").value;
   const sumbis = document.getElementById("sumbis").value;
 
+  const url = window.location.href;
+  const path = url.split("/").pop();
+
   // Call the API (assuming a POST request)
-  fetch("/api/production-longterm", {
+  fetch(`/api/${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -336,8 +354,11 @@ document.getElementById("export").addEventListener("click", function (event) {
   const business = document.getElementById("business").value;
   const sumbis = document.getElementById("sumbis").value;
 
+  const url = window.location.href;
+  const path = url.split("/").pop();
+
   // Call the API (assuming a POST request)
-  fetch("/api/export-production-longterm", {
+  fetch(`/api/export-${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -357,16 +378,31 @@ document.getElementById("export").addEventListener("click", function (event) {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      return response.blob();
+
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = "";
+
+      if (
+        contentDisposition &&
+        contentDisposition.indexOf("attachment") !== -1
+      ) {
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(contentDisposition);
+        if (matches != null && matches[1]) {
+          filename = matches[1].replace(/['"]/g, "");
+        }
+      }
+
+      return response.blob().then((blob) => ({ blob, filename }));
     })
-    .then((blob) => {
+    .then(({ blob, filename }) => {
       // Create a link element
       const link = document.createElement("a");
 
       // Create a URL for the Blob
       const url = window.URL.createObjectURL(blob);
       link.href = url;
-      link.download = "Detail_Produksi_Longterm.xlsx";
+      link.download = filename;
 
       // Append the link to the body
       document.body.appendChild(link);

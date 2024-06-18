@@ -56,3 +56,19 @@ type Data struct {
 	Ricom         float32 `json:"Ricom"`
 	Npw           float32 `json:"Npw"`
 }
+
+// Convert column number to Excel column letter
+func toAlphaString(n int) string {
+	if n <= 0 {
+		return ""
+	}
+	alpha := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	alphaLen := len(alpha)
+	result := ""
+	for n > 0 {
+		index := (n - 1) % alphaLen
+		result = string(alpha[index]) + result
+		n = (n - 1) / alphaLen
+	}
+	return result
+}

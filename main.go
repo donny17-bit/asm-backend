@@ -49,6 +49,7 @@ func main() {
 
 	// production yr
 	router.POST("/api/production-yearly", production.ProductionYr)
+	router.POST("/api/export-production-yearly", production.ExportProdYr)
 
 	// master
 	router.GET("/api/branch", master.GetBranch)
