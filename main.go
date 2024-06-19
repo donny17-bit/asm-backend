@@ -18,7 +18,8 @@ import (
 // use session
 func main() {
 	router := gin.Default()
-	// router.Use(CORS())
+	router.Use(CORS())
+	
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Print("Load env failed")
@@ -77,10 +78,10 @@ func CORS() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Signature, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
-		c.Writer.Header().Set("Content-Type", "application/json, text/html")
-		c.Writer.Header().Set("X-Content-Type-Options", "nosniff")
-		c.Writer.Header().Set("X-Frame-Options", "SAMEORIGIN")
-		c.Writer.Header().Set("X-XSS-Protection", "1; mode=block")
+		// c.Writer.Header().Set("Content-Type", "application/json, text/html")
+		// c.Writer.Header().Set("X-Content-Type-Options", "nosniff")
+		// c.Writer.Header().Set("X-Frame-Options", "SAMEORIGIN")
+		// c.Writer.Header().Set("X-XSS-Protection", "1; mode=block")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)

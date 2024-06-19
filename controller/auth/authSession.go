@@ -34,7 +34,7 @@ func LoginSession(c *gin.Context) {
 	defer db.Close()
 
 	// Execute a query
-	query := "SELECT NIK, PASS_ID, TRUNC(TGL_AKHIR), LDI_ID, CAB_ID FROM LST_USER_ASURANSI WHERE NIK = :param1 AND PASS_ID = :param2 AND STS_AKTIF = '1'"
+	query := "SELECT A.NIK, B.MCL_NAME AS NAMA, A.PASS_ID, TRUNC (A.TGL_AKHIR), A.LDI_ID, A.CAB_ID FROM LST_USER_ASURANSI A, HRDASM.V_HRD_MST B WHERE     A.NIK = B.NIK AND A.NIK = :param1 AND A.PASS_ID = :param2 AND A.STS_AKTIF = '1'"
 	rows, err := db.Query(query, nik, password)
 
 	if err != nil {
@@ -43,9 +43,11 @@ func LoginSession(c *gin.Context) {
 	}
 
 	defer rows.Close()
+
 	// Iterate through the result set
 	var (
 		nikDb      string
+		nama 	   string
 		passwordDb string
 		tgl_akhir  string
 		ldi_id     string
@@ -53,7 +55,7 @@ func LoginSession(c *gin.Context) {
 	)
 
 	for rows.Next() {
-		if err := rows.Scan(&nikDb, &passwordDb, &tgl_akhir, &ldi_id, &cab_id); err != nil {
+		if err := rows.Scan(&nikDb, &nama, &passwordDb, &tgl_akhir, &ldi_id, &cab_id); err != nil {
 			fmt.Println("Error scanning row:", err)
 			return
 		}
@@ -78,6 +80,7 @@ func LoginSession(c *gin.Context) {
 
 		session.Set("id", id)
 		session.Set("nik", nik)
+		session.Set("nama", nama)
 		session.Set("ldc_id", cab_id)
 		session.Set("lastActivity", lastActivity.Unix())
 		session.Set("expiration", expiration.Unix())

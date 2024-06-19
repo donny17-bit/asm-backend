@@ -17,10 +17,10 @@ func ProductionLt(c *gin.Context) {
 	session := sessions.Default(c)
 	ldc_id := session.Get("ldc_id") // default sesuai info login
 
-	// if ldc_id == nil {
-	// 	fmt.Println("error cabang kosong")
-	// 	return
-	// }
+	if ldc_id == nil {
+		fmt.Println("error cabang kosong")
+		return
+	}
 
 	var inputData InputData
 	if err := c.BindJSON(&inputData); err != nil {
