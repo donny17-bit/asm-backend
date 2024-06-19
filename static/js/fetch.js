@@ -413,3 +413,26 @@ document.getElementById("export").addEventListener("click", function (event) {
     })
     .catch((error) => console.error("Error:", error));
 });
+
+document.getElementById("logout").addEventListener("click", function (event) {
+  event.preventDefault();
+
+  fetch("/api/logout", {
+    method: "GET",
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      return response.json();
+    })
+    .then((json) => {
+      if (json.status != 200) {
+        return console.log(json.message);
+      }
+
+      return (window.location.href = "/login");
+    })
+    .catch((error) => console.error("Error:", error));
+});
