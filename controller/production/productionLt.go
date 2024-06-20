@@ -8,48 +8,44 @@ import (
 	"strconv"
 	"time"
 
-	// "github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 
 func ProductionLt(c *gin.Context) {
-	// session := sessions.Default(c)
-	// ldc_id := session.Get("ldc_id") // default sesuai info login
+	session := sessions.Default(c)
+	ldc_id := session.Get("ldc_id") // sesuai login cabang user
 
-	// id := session.Get("id")
-	// nik := session.Get("nik")
-	// lastActivity := session.Get("lastActivity")
-	// expiration := session.Get("expiration")
+	id := session.Get("id")
+	nik := session.Get("nik")
+	lastActivity := session.Get("lastActivity")
+	expiration := session.Get("expiration")
 
 	fmt.Println("production controller")
-	// fmt.Println("session : ", session)
-	// fmt.Println("id : ", id)
-	// fmt.Println("nik : ", nik)
-	// fmt.Println("ldc_id : ", ldc_id)
-	// fmt.Println("lastActivity : ", lastActivity)
-	// fmt.Println("expiration : ", expiration)
+	fmt.Println("session : ", session)
+	fmt.Println("id : ", id)
+	fmt.Println("nik : ", nik)
+	fmt.Println("ldc_id : ", ldc_id)
+	fmt.Println("lastActivity : ", lastActivity)
+	fmt.Println("expiration : ", expiration)
 
 
-	// if ldc_id == nil {
-	// 	fmt.Println("error cabang kosong")
-	// 	return
-	// }
+	if ldc_id == nil {
+		fmt.Println("error cabang kosong")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":        400,
+			"data":          nil,
+			"message":       "Failed get data, cabang is not present in session",
+		})
+		return
+	}
 
 	var inputData InputData
 	if err := c.BindJSON(&inputData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	// // cek jika ldc_id ada di request
-	var ldc_id_param string
-
-	// if ldc_id != nil {
-	// 	ldc_id_param = ldc_id.(string)
-	// } else {
-	// 	ldc_id_param = c.PostForm("ldc_id")
-	// }
 
 	page := inputData.Page          // req
 	pageSize := inputData.Page_size // req
@@ -67,7 +63,7 @@ func ProductionLt(c *gin.Context) {
 	var formatedBeginDate string
 	var formatedEndDate string
 
-	fmt.Println("ldc_id_param", ldc_id_param)
+	fmt.Println("ldc_id", ldc_id)
 	fmt.Println("noPolis", noPolis)
 	fmt.Println("noCif", noCif)
 	fmt.Println("beginDate", beginDate)
@@ -99,7 +95,7 @@ func ProductionLt(c *gin.Context) {
 
 	// cek total row ----------------------------------------------------------------
 	queryRow := "select count(1) as total_rows FROM PRODUCTION_GABUNGAN_VIEW A JOIN MV_AGEN MA ON A.LAG_ID = MA.LAG_AGEN_ID JOIN LST_CABANG LC ON A.LDC_ID = LC.LDC_ID JOIN LST_BUSINESS LB ON A.LBU_ID = LB.LBU_ID JOIN LST_GRP_BUSINESS LGB ON LB.LGB_ID = LGB.LGB_ID JOIN LST_JN_PRODUKSI LJP ON LJP.LJP_ID = A.LJP_ID JOIN JNNER JNN ON JNN.JN_NER = A.JN_NER LEFT OUTER JOIN LST_MO MO ON A.LMO_ID = MO.LMO_ID LEFT OUTER JOIN MST_CLIENT MC ON A.CLIENT_ID = MC.MCL_ID LEFT OUTER JOIN LST_JENIS_COAS JN_COAS ON A.MDS_JN_COAS = JN_COAS.MDS_JN_COAS "
-	whereRow := "where a.ldc_id = '" + ldc_id_param + "' "
+	whereRow := "where a.ldc_id = '" + ldc_id.(string) + "' "
 
 	queryRow = queryRow + whereRow
 
@@ -206,7 +202,7 @@ func ProductionLt(c *gin.Context) {
 	// get query
 	// var queryFinal string
 	queryFinal := "exec SP_DETAIL_PRODUCTION_LONGTERM " + " "
-	where := "'" + order + "', '" + sort + "', '" + page + "', '" + pageSize + "', 'where a.ldc_id = ''" + ldc_id_param + "''" + " "
+	where := "'" + order + "', '" + sort + "', '" + page + "', '" + pageSize + "', 'where a.ldc_id = ''" + ldc_id.(string) + "''" + " "
 
 	queryFinal = queryFinal + where
 

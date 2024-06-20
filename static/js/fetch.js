@@ -46,6 +46,7 @@ if (formFilter) {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("data : ", data);
         if (data.status === 400) {
           alert(data.message);
           return;

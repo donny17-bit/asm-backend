@@ -87,7 +87,7 @@ func LoginSession(c *gin.Context) {
 		session.Set("expiration", expiration.Unix())
 		session.Options(sessions.Options{
 			MaxAge: 1800, // 30 minutes
-			// Path:   "/",
+			Path:   "/",
 		})
 		session.Save()
 
@@ -138,6 +138,7 @@ func LogoutSession(c *gin.Context) {
 	// Clear the session
 	session.Options(sessions.Options{
 		MaxAge: 0, // 0 minutes
+		Path:   "/",
 	})
 	session.Save()
 	session.Clear()
@@ -205,7 +206,7 @@ func IsActive(c *gin.Context) bool {
 		// log out session
 		session.Options(sessions.Options{
 			MaxAge: 0, // 0 minutes
-			// Path:   "/",
+			Path:   "/",
 		})
 		session.Save()
 		session.Clear()
@@ -227,7 +228,7 @@ func IsActive(c *gin.Context) bool {
 	session.Set("expiration", expirationNew.Unix())
 	session.Options(sessions.Options{
 		MaxAge: 1800, // 30 minutes
-		// Path:   "/",
+		Path:   "/",
 	})
 	session.Save()
 
