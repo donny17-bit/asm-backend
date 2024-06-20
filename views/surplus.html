@@ -10,7 +10,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>Produksi | E-Report Sinarmas</title>
+    <title>Surplus UW Longterm | E-Report Sinarmas</title>
 
     <!-- Custom fonts for this template -->
     <link
@@ -116,7 +116,7 @@
               <a class="collapse-item" href="/surplus-longterm"
                 >Surplus Longterm</a
               >
-              <a class="collapse-item" href="#">Surplus Yearly</a>
+              <a class="collapse-item" href="/surplus-yearly">Surplus Yearly</a>
             </div>
           </div>
         </li>
@@ -170,7 +170,7 @@
             <div
               class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100"
             >
-              <h4>Produksi Longterm</h4>
+              <h4>Surplus UW Longterm</h4>
             </div>
 
             <!-- Topbar Navbar -->
@@ -228,26 +228,34 @@
               <div class="card-body">
                 <form id="formFilter">
                   <p>Periode</p>
-                  <div style="display: flex; width: 48%">
-                    <input
-                      type="date"
-                      class="form-control"
-                      name="begin_date"
-                      id="begin_date"
-                      style="flex: 2"
-                      value="{{.begin_date}}"
-                    />
-                    <p class="mt-2" style="flex: 0.5; text-align: center">
-                      s/d
-                    </p>
-                    <input
-                      type="date"
-                      class="form-control"
-                      name="end_date"
-                      id="end_date"
-                      value="{{.end_date}}"
-                      style="flex: 2"
-                    />
+                  <div class="dropdown">
+                    <button
+                      class="btn btn-outline-secondary dropdown-toggle"
+                      type="button"
+                      id="page_size"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                      value="1 January 2024 s/d 18 June 2024 06"
+                    >
+                      1 January 2024 s/d 18 June 2024 06
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li>
+                        <a class="dropdown-item" id="page_size_10">10</a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" id="page_size_50">50</a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" id="page_size_100">100</a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" id="page_size_500">500</a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" id="page_size_1000">1000</a>
+                      </li>
+                    </ul>
                   </div>
                   <div
                     style="

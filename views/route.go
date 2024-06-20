@@ -3,7 +3,7 @@ package views
 import (
 	"net/http"
 
-	// "github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,46 +16,38 @@ func GetLogin(c *gin.Context) {
 }
 
 func GetDashboard(c *gin.Context) {
-	// session := sessions.Default(c)
-	// nama := session.Get("nama")
+	session := sessions.Default(c)
+	nama := session.Get("nama")
 
-	// c.HTML(http.StatusOK, "dashboard.html", gin.H{
-    //     "nama": nama,
-    // })
-
-	c.HTML(http.StatusOK, "dashboard.html", nil)
+	c.HTML(http.StatusOK, "dashboard.html", gin.H{
+        "nama": nama,
+    })
 }
 
 func GetProductionLt(c *gin.Context) {
-	// session := sessions.Default(c)
-	// nama := session.Get("nama")
-
-	// ldc_id := session.Get("ldc_id") // default sesuai info logi
-	// id := session.Get("id")
-	// nik := session.Get("nik")
-	// lastActivity := session.Get("lastActivity")
-	// expiration := session.Get("expiration")
-
-	// fmt.Println("route controller")
-	// fmt.Println("session : ", session)
-	// fmt.Println("id : ", id)
-	// fmt.Println("nik : ", nik)
-	// fmt.Println("ldc_id : ", ldc_id)
-	// fmt.Println("lastActivity : ", lastActivity)
-	// fmt.Println("expiration : ", expiration)
-
+	session := sessions.Default(c)
+	nama := session.Get("nama")
 
 	c.HTML(http.StatusOK, "production.html", gin.H{
-        "nama": "username",
+        "nama": nama,
     })
 }
 
 func GetProductionYr(c *gin.Context) {
-	// session := sessions.Default(c)
-	// nama := session.Get("nama")
+	session := sessions.Default(c)
+	nama := session.Get("nama")
 
 	c.HTML(http.StatusOK, "production-yearly.html", gin.H{
-        "nama": "username",
+        "nama": nama,
+    })
+}
+
+func GetSurplusLt(c *gin.Context) {
+	session := sessions.Default(c)
+	nama := session.Get("nama")
+
+	c.HTML(http.StatusOK, "surplus.html", gin.H{
+        "nama": nama,
     })
 }
 

@@ -4,6 +4,7 @@ import (
 	"asm-backend/controller/auth"
 	"asm-backend/controller/master"
 	"asm-backend/controller/production"
+	"asm-backend/controller/surplus"
 	"asm-backend/views"
 	"asm-backend/web"
 	"fmt"
@@ -18,7 +19,7 @@ import (
 // use session
 func main() {
 	router := gin.Default()
-	// router.Use(CORS())
+	router.Use(CORS())
 	
 	err := godotenv.Load()
 	if err != nil {
@@ -38,6 +39,8 @@ func main() {
 	router.GET("/dashboard", views.GetDashboard)
 	router.GET("/production-longterm", views.GetProductionLt)
 	router.GET("/production-yearly", views.GetProductionYr)
+	router.GET("/surplus-longterm", views.GetSurplusLt)
+	// router.GET("/surplus-yearly", views.GetSurplusYr)
 
 	// production lt
 	router.POST("/api/production-longterm", production.ProductionLt)
@@ -47,6 +50,9 @@ func main() {
 	router.POST("/api/production-yearly", production.ProductionYr)
 	router.POST("/api/export-production-yearly", production.ExportProdYr)
 
+	// surplus lt
+	router.GET("/api/surplus-longterm", surplus.SurplusLt)
+
 	// master
 	router.GET("/api/branch", master.GetBranch)
 	router.GET("/api/business", master.GetBusiness)
@@ -54,7 +60,6 @@ func main() {
 	router.GET("/api/business-source", web.GetBusinessSource)
 
 	// auth
-	// router.POST("/api/login", auth.LoginSessionSql) // sql
 	router.POST("/api/login", auth.LoginSession) // oracle
 	// router.POST("/api/user-division", auth.LoginSession) // blm dipake
 	router.GET("/api/logout", auth.LogoutSession)
