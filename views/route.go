@@ -50,8 +50,6 @@ func GetSurplusLt(c *gin.Context) {
 
 	mthname := master.Mthname()
 
-	// mthname := []string{"January", "February", "March", "April", "May"}
-
 	fmt.Println("mthname : ", mthname)
 	fmt.Println("mthname 2 : ", mthname[2])
 

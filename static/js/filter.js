@@ -19,3 +19,7 @@ document.getElementById("clear").addEventListener("click", function (event) {
   business.value = "";
   sumbis.value = "";
 });
+
+const mthname = document.getElementById("mthname");
+if (mthname) {
+}
