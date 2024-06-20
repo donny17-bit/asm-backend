@@ -15,6 +15,7 @@ func LoginSession(c *gin.Context) {
 	nik := c.PostForm("nik")
 	password := c.PostForm("password")
 
+	fmt.Println("login controller : ")
 	fmt.Println("nik : ", nik)
 	fmt.Println("password : ", password)
 
@@ -86,7 +87,7 @@ func LoginSession(c *gin.Context) {
 		session.Set("expiration", expiration.Unix())
 		session.Options(sessions.Options{
 			MaxAge: 1800, // 30 minutes
-			Path:   "/",
+			// Path:   "/",
 		})
 		session.Save()
 
@@ -156,6 +157,7 @@ func IsActive(c *gin.Context) bool {
 	lastActivity := session.Get("lastActivity")
 	expiration := session.Get("expiration")
 
+	fmt.Println("is active controller")
 	fmt.Println("session : ", session)
 	fmt.Println("id : ", id)
 	fmt.Println("nik : ", nik)
@@ -203,7 +205,7 @@ func IsActive(c *gin.Context) bool {
 		// log out session
 		session.Options(sessions.Options{
 			MaxAge: 0, // 0 minutes
-			Path:   "/",
+			// Path:   "/",
 		})
 		session.Save()
 		session.Clear()
@@ -225,7 +227,7 @@ func IsActive(c *gin.Context) bool {
 	session.Set("expiration", expirationNew.Unix())
 	session.Options(sessions.Options{
 		MaxAge: 1800, // 30 minutes
-		Path:   "/",
+		// Path:   "/",
 	})
 	session.Save()
 

@@ -18,7 +18,7 @@ import (
 // use session
 func main() {
 	router := gin.Default()
-	router.Use(CORS())
+	// router.Use(CORS())
 	
 	err := godotenv.Load()
 	if err != nil {
@@ -31,12 +31,7 @@ func main() {
 
 	// load all the static file
 	router.LoadHTMLGlob("views/*.html")
-	router.Static("/static/css", "./static/css")
-	router.Static("/static/fonts", "./static/fonts")
-	router.Static("/static/image", "./static/image")
-	router.Static("/static/js", "./static/js")
-	router.Static("/static/scss", "./static/scss")
-	router.Static("/static/vendor", "./static/vendor")
+	router.Static("/static", "./static")
 
 	// views
 	router.GET("/login", views.GetLogin)
@@ -62,7 +57,7 @@ func main() {
 	// router.POST("/api/login", auth.LoginSessionSql) // sql
 	router.POST("/api/login", auth.LoginSession) // oracle
 	// router.POST("/api/user-division", auth.LoginSession) // blm dipake
-	router.GET("/api/logout", auth.LogoutSessionSql)
+	router.GET("/api/logout", auth.LogoutSession)
 
 	// nnti diganti kalo udh login redirect langsung ke dalam menu dasboard
 	router.GET("/", views.GetLogin)

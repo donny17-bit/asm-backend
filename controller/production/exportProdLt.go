@@ -23,17 +23,10 @@ func ExportProdLt(c *gin.Context) {
 		return
 	}
 
-	auth_server := os.Getenv("auth_server")
-
 	var ok bool
 
-	if auth_server == "oracle" {
-		ok = auth.IsActive(c)
-	}
-
-	if auth_server == "sql" {
-		ok = auth.IsActiveSql(c)
-	}
+	ok = auth.IsActive(c)
+	
 
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{

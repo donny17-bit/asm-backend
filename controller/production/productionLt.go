@@ -8,19 +8,33 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gin-contrib/sessions"
+	// "github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 
 func ProductionLt(c *gin.Context) {
-	session := sessions.Default(c)
-	ldc_id := session.Get("ldc_id") // default sesuai info login
+	// session := sessions.Default(c)
+	// ldc_id := session.Get("ldc_id") // default sesuai info login
 
-	if ldc_id == nil {
-		fmt.Println("error cabang kosong")
-		return
-	}
+	// id := session.Get("id")
+	// nik := session.Get("nik")
+	// lastActivity := session.Get("lastActivity")
+	// expiration := session.Get("expiration")
+
+	fmt.Println("production controller")
+	// fmt.Println("session : ", session)
+	// fmt.Println("id : ", id)
+	// fmt.Println("nik : ", nik)
+	// fmt.Println("ldc_id : ", ldc_id)
+	// fmt.Println("lastActivity : ", lastActivity)
+	// fmt.Println("expiration : ", expiration)
+
+
+	// if ldc_id == nil {
+	// 	fmt.Println("error cabang kosong")
+	// 	return
+	// }
 
 	var inputData InputData
 	if err := c.BindJSON(&inputData); err != nil {
@@ -31,11 +45,11 @@ func ProductionLt(c *gin.Context) {
 	// // cek jika ldc_id ada di request
 	var ldc_id_param string
 
-	if ldc_id != nil {
-		ldc_id_param = ldc_id.(string)
-	} else {
-		ldc_id_param = c.PostForm("ldc_id")
-	}
+	// if ldc_id != nil {
+	// 	ldc_id_param = ldc_id.(string)
+	// } else {
+	// 	ldc_id_param = c.PostForm("ldc_id")
+	// }
 
 	page := inputData.Page          // req
 	pageSize := inputData.Page_size // req
