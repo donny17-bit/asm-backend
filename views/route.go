@@ -1,6 +1,8 @@
 package views
 
 import (
+	"asm-backend/controller/master"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -46,8 +48,16 @@ func GetSurplusLt(c *gin.Context) {
 	session := sessions.Default(c)
 	nama := session.Get("nama")
 
+	mthname := master.Mthname()
+
+	// mthname := []string{"January", "February", "March", "April", "May"}
+
+	fmt.Println("mthname : ", mthname)
+	fmt.Println("mthname 2 : ", mthname[2])
+
 	c.HTML(http.StatusOK, "surplus.html", gin.H{
         "nama": nama,
+		"mthname" : mthname,
     })
 }
 

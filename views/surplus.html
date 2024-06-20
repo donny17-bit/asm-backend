@@ -235,28 +235,21 @@
                       id="page_size"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
-                      value="1 January 2024 s/d 18 June 2024 06"
                     >
-                      1 January 2024 s/d 18 June 2024 06
+                      {{ index .mthname 1}}
                     </button>
-                    <ul class="dropdown-menu">
+                    <ul
+                      class="dropdown-menu"
+                      style="max-height: 300px; overflow-y: auto"
+                    >
+                      {{ range .mthname}}
                       <li>
-                        <a class="dropdown-item" id="page_size_10">10</a>
+                        <a class="dropdown-item" id="page_size_10">{{.}}</a>
                       </li>
-                      <li>
-                        <a class="dropdown-item" id="page_size_50">50</a>
-                      </li>
-                      <li>
-                        <a class="dropdown-item" id="page_size_100">100</a>
-                      </li>
-                      <li>
-                        <a class="dropdown-item" id="page_size_500">500</a>
-                      </li>
-                      <li>
-                        <a class="dropdown-item" id="page_size_1000">1000</a>
-                      </li>
+                      {{end}}
                     </ul>
                   </div>
+                  <!-- end dropdown select -->
                   <div
                     style="
                       display: flex;
@@ -448,49 +441,7 @@
                         <th>NPW</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {{ range .data }}
-                      <tr>
-                        <td>{{ .Rn}}</td>
-                        <td>{{ .ProdDate}}</td>
-                        <td>{{ .BeginDate}}</td>
-                        <td>{{ .EndDate}}</td>
-                        <td>{{ .Mo}}</td>
-                        <td>{{ .ClientName}}</td>
-                        <td>{{ .Kanwil}}</td>
-                        <td>{{ .Cabang}}</td>
-                        <td>{{ .Perwakilan}}</td>
-                        <td>{{ .SubPerwakilan}}</td>
-                        <td>{{ .Jnner}}</td>
-                        <td>{{ .JenisProd}}</td>
-                        <td>{{ .JenisPaket}}</td>
-                        <td>{{ .Ket}}</td>
-                        <td>{{ .NamaCeding}}</td>
-                        <td>{{ .Namaleader0}}</td>
-                        <td>{{ .Namaleader1}}</td>
-                        <td>{{ .Namaleader2}}</td>
-                        <td>{{ .Namaleader3}}</td>
-                        <td>{{ .GroupBusiness}}</td>
-                        <td>{{ .Business}}</td>
-                        <td>{{ .NoKontrak}}</td>
-                        <td>{{ .NoPolis}}</td>
-                        <td>{{ .NoCif}}</td>
-                        <td>{{ .ProdKe}}</td>
-                        <td>{{ .NamaDealer}}</td>
-                        <td>{{ .Tsi}}</td>
-                        <td>{{ .Gpw}}</td>
-                        <td>{{ .Disc}}</td>
-                        <td>{{ .Disc2}}</td>
-                        <td>{{ .Comm}}</td>
-                        <td>{{ .Oc}}</td>
-                        <td>{{ .Bkp}}</td>
-                        <td>{{ .Ngpw}}</td>
-                        <td>{{ .Ri}}</td>
-                        <td>{{ .Ricom}}</td>
-                        <td>{{ .Npw}}</td>
-                      </tr>
-                      {{ end }}
-                    </tbody>
+                    <tbody></tbody>
                   </table>
                 </div>
 
