@@ -5,7 +5,6 @@ import (
 	"fmt"
 )
 
-// create data type
 type MthNameData string
 
 func Mthname() []MthNameData {
@@ -53,8 +52,6 @@ func Mthname() []MthNameData {
 		fmt.Println("Error iterating rows:", err)
 		return nil
 	}
-
-	// fmt.Println("mthname : ", mthnameData)
 
 	return mthnameData
 }

@@ -49,7 +49,7 @@ func ProductionLt(c *gin.Context) {
 
 	page := inputData.Page          // req
 	pageSize := inputData.Page_size // req
-	sort := "asc"                   // opt
+	sort := ""                   // opt
 	order := "thnbln, client_name"  // order default (req)
 	noPolis := inputData.No_polis
 	noCif := inputData.No_cif
@@ -85,7 +85,7 @@ func ProductionLt(c *gin.Context) {
 
 	// field begin date & end date harus di isi
 	if beginDate == "" || endDate == "" {
-		c.JSON(http.StatusOK, gin.H{ // nnti status ok nya di ganti status failed
+		c.JSON(http.StatusBadRequest, gin.H{ // nnti status ok nya di ganti status failed
 			"status":  400,
 			"data":    "",
 			"message": "Failed get data, please provide valid date periode",
@@ -176,7 +176,12 @@ func ProductionLt(c *gin.Context) {
 		err := countRows.Scan(&totalRows)
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error in count rows": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{ 
+				"status":  400,
+				"data":    "",
+				"message": "Failed get data, eror on the server "+err.Error(),
+			})
+			return
 		}
 	}
 
@@ -184,7 +189,7 @@ func ProductionLt(c *gin.Context) {
 
 	pageSizeNum, err := strconv.Atoi(pageSize)
 	if err != nil {
-		fmt.Println("Error convert page size to int :", err)
+		fmt.Println("Error convert page size to int 1 :", err)
 		return
 	}
 
@@ -323,8 +328,12 @@ func ProductionLt(c *gin.Context) {
 		)
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			// fmt.Println("Error scanning row:", err)
+			c.JSON(http.StatusBadRequest, gin.H{ 
+				"status":  400,
+				"data":    "",
+				"message": "Failed get data, eror on the server "+err.Error(),
+			})
+			return
 		}
 
 		// Append the struct to the array
@@ -355,13 +364,13 @@ func ProductionLt(c *gin.Context) {
 
 	currentPage, err := strconv.Atoi(page)
 	if err != nil {
-		fmt.Println("Error convert page size to int :", err)
+		fmt.Println("Error convert page size to int 2 :", err)
 		return
 	}
 
 	pageSizeInt, err := strconv.Atoi(pageSize)
 	if err != nil {
-		fmt.Println("Error convert page size to int :", err)
+		fmt.Println("Error convert page size to int 3 :", err)
 		return
 	}
 

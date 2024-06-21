@@ -21,7 +21,7 @@ type Data struct {
 	BeginDate     string  `json:"BeginDate"`
 	EndDate       string  `json:"EndDate"`
 	Mo            string  `json:"Mo"`
-	ClientName    string  `json:"ClientName"`
+	ClientName    *string `json:"ClientName"`
 	Kanwil        string  `json:"Kanwil"`
 	Cabang        string  `json:"Cabang"`
 	Perwakilan    string  `json:"Perwakilan"`

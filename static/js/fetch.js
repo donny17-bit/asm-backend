@@ -7,20 +7,52 @@ const previous = document.getElementById("previous");
 const next = document.getElementById("next");
 const exportBtn = document.getElementById("export");
 const logout = document.getElementById("logout");
+let dataReq = {};
+
+const last_page = document.getElementById("last_page");
+const previous_page = document.getElementById("previous_page");
+const next_page = document.getElementById("next_page");
+const page_size = document.getElementById("page_size");
+const periode = document.getElementById("periode");
+const begin_date = document.getElementById("begin_date");
+const end_date = document.getElementById("end_date");
+const no_polis = document.getElementById("no_polis");
+const no_cif = document.getElementById("no_cif");
+const client_name = document.getElementById("client_name");
+const branch = document.getElementById("branch");
+const business = document.getElementById("business");
+const sumbis = document.getElementById("sumbis");
 
 if (formFilter) {
   formFilter.addEventListener("submit", function (event) {
     event.preventDefault();
 
-    const page_size = document.getElementById("page_size").value; //inlcude
-    const begin_date = document.getElementById("begin_date").value; //include
-    const end_date = document.getElementById("end_date").value; //include
-    const no_polis = document.getElementById("no_polis").value; //include
-    const no_cif = document.getElementById("no_cif").value; // include
-    const client_name = document.getElementById("client_name").value; // include
-    const branch = document.getElementById("branch").value; // include
-    const business = document.getElementById("business").value; // include
-    const sumbis = document.getElementById("sumbis").value; // include
+    if (periode) {
+      dataReq = {
+        page: "1",
+        page_size: page_size.value,
+        periode: periode.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    } else {
+      dataReq = {
+        page: "1",
+        page_size: page_size.value,
+        begin_date: begin_date.value,
+        end_date: end_date.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    }
 
     const url = window.location.href;
     const path = url.split("/").pop();
@@ -31,35 +63,27 @@ if (formFilter) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        page: "1",
-        page_size: page_size,
-        begin_date: begin_date,
-        end_date: end_date,
-        no_polis: no_polis,
-        no_cif: no_cif,
-        client_name: client_name,
-        branch: branch,
-        business: business,
-        sumbis: sumbis,
-      }),
+      body: JSON.stringify(dataReq),
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("data : ", data);
         if (data.status === 400) {
           alert(data.message);
           return;
         }
 
         // table
-        table(data);
+        if (path.includes("surplus")) {
+          tableSurplus(data);
+        } else {
+          table(data);
+        }
 
         // pagination script
         pagination(data);
       })
       .catch((error) => {
-        return console.error("Error:", error);
+        return console.error("Error: ", error);
       });
   });
 }
@@ -68,16 +92,32 @@ if (nextPage) {
   nextPage.addEventListener("click", function (event) {
     event.preventDefault();
 
-    const next_page = document.getElementById("next_page").textContent;
-    const page_size = document.getElementById("page_size").value;
-    const begin_date = document.getElementById("begin_date").value;
-    const end_date = document.getElementById("end_date").value;
-    const no_polis = document.getElementById("no_polis").value;
-    const no_cif = document.getElementById("no_cif").value;
-    const client_name = document.getElementById("client_name").value;
-    const branch = document.getElementById("branch").value;
-    const business = document.getElementById("business").value;
-    const sumbis = document.getElementById("sumbis").value;
+    if (periode) {
+      dataReq = {
+        page: next_page.textContent,
+        page_size: page_size.value,
+        periode: periode.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    } else {
+      dataReq = {
+        page: next_page.textContent,
+        page_size: page_size.value,
+        begin_date: begin_date.value,
+        end_date: end_date.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    }
 
     const url = window.location.href;
     const path = url.split("/").pop();
@@ -88,23 +128,21 @@ if (nextPage) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        page: next_page,
-        page_size: page_size,
-        begin_date: begin_date,
-        end_date: end_date,
-        no_polis: no_polis,
-        no_cif: no_cif,
-        client_name: client_name,
-        branch: branch,
-        business: business,
-        sumbis: sumbis,
-      }),
+      body: JSON.stringify(dataReq),
     })
       .then((response) => response.json())
       .then((data) => {
+        if (data.status === 400) {
+          alert(data.message);
+          return;
+        }
+
         // table
-        table(data);
+        if (path.includes("surplus")) {
+          tableSurplus(data);
+        } else {
+          table(data);
+        }
 
         // pagination script
         pagination(data);
@@ -117,16 +155,32 @@ if (previousPage) {
   previousPage.addEventListener("click", function (event) {
     event.preventDefault();
 
-    const previous_page = document.getElementById("previous_page").textContent;
-    const page_size = document.getElementById("page_size").value;
-    const begin_date = document.getElementById("begin_date").value;
-    const end_date = document.getElementById("end_date").value;
-    const no_polis = document.getElementById("no_polis").value;
-    const no_cif = document.getElementById("no_cif").value;
-    const client_name = document.getElementById("client_name").value;
-    const branch = document.getElementById("branch").value;
-    const business = document.getElementById("business").value;
-    const sumbis = document.getElementById("sumbis").value;
+    if (periode) {
+      dataReq = {
+        page: previous_page.textContent,
+        page_size: page_size.value,
+        periode: periode.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    } else {
+      dataReq = {
+        page: previous_page.textContent,
+        page_size: page_size.value,
+        begin_date: begin_date.value,
+        end_date: end_date.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    }
 
     const url = window.location.href;
     const path = url.split("/").pop();
@@ -137,23 +191,22 @@ if (previousPage) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        page: previous_page,
-        page_size: page_size,
-        begin_date: begin_date,
-        end_date: end_date,
-        no_polis: no_polis,
-        no_cif: no_cif,
-        client_name: client_name,
-        branch: branch,
-        business: business,
-        sumbis: sumbis,
-      }),
+      body: JSON.stringify(dataReq),
     })
       .then((response) => response.json())
       .then((data) => {
         // table
-        table(data);
+        if (data.status === 400) {
+          alert(data.message);
+          return;
+        }
+
+        // table
+        if (path.includes("surplus")) {
+          tableSurplus(data);
+        } else {
+          table(data);
+        }
 
         // pagination script
         pagination(data);
@@ -166,15 +219,32 @@ if (firstPage) {
   firstPage.addEventListener("click", function (event) {
     event.preventDefault();
 
-    const page_size = document.getElementById("page_size").value;
-    const begin_date = document.getElementById("begin_date").value;
-    const end_date = document.getElementById("end_date").value;
-    const no_polis = document.getElementById("no_polis").value;
-    const no_cif = document.getElementById("no_cif").value;
-    const client_name = document.getElementById("client_name").value;
-    const branch = document.getElementById("branch").value;
-    const business = document.getElementById("business").value;
-    const sumbis = document.getElementById("sumbis").value;
+    if (periode) {
+      dataReq = {
+        page: "1",
+        page_size: page_size.value,
+        periode: periode.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    } else {
+      dataReq = {
+        page: "1",
+        page_size: page_size.value,
+        begin_date: begin_date.value,
+        end_date: end_date.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    }
 
     const url = window.location.href;
     const path = url.split("/").pop();
@@ -185,23 +255,22 @@ if (firstPage) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        page: "1",
-        page_size: page_size,
-        begin_date: begin_date,
-        end_date: end_date,
-        no_polis: no_polis,
-        no_cif: no_cif,
-        client_name: client_name,
-        branch: branch,
-        business: business,
-        sumbis: sumbis,
-      }),
+      body: JSON.stringify(dataReq),
     })
       .then((response) => response.json())
       .then((data) => {
         // table
-        table(data);
+        if (data.status === 400) {
+          alert(data.message);
+          return;
+        }
+
+        // table
+        if (path.includes("surplus")) {
+          tableSurplus(data);
+        } else {
+          table(data);
+        }
 
         // pagination script
         pagination(data);
@@ -214,16 +283,32 @@ if (lastPage) {
   lastPage.addEventListener("click", function (event) {
     event.preventDefault();
 
-    const last_page = document.getElementById("last_page").textContent;
-    const page_size = document.getElementById("page_size").value;
-    const begin_date = document.getElementById("begin_date").value;
-    const end_date = document.getElementById("end_date").value;
-    const no_polis = document.getElementById("no_polis").value;
-    const no_cif = document.getElementById("no_cif").value;
-    const client_name = document.getElementById("client_name").value;
-    const branch = document.getElementById("branch").value;
-    const business = document.getElementById("business").value;
-    const sumbis = document.getElementById("sumbis").value;
+    if (periode) {
+      dataReq = {
+        page: "1",
+        page_size: page_size.value,
+        periode: periode.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    } else {
+      dataReq = {
+        page: last_page.textContent,
+        page_size: page_size.value,
+        begin_date: begin_date.value,
+        end_date: end_date.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    }
 
     const url = window.location.href;
     const path = url.split("/").pop();
@@ -234,23 +319,22 @@ if (lastPage) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        page: last_page,
-        page_size: page_size,
-        begin_date: begin_date,
-        end_date: end_date,
-        no_polis: no_polis,
-        no_cif: no_cif,
-        client_name: client_name,
-        branch: branch,
-        business: business,
-        sumbis: sumbis,
-      }),
+      body: JSON.stringify(dataReq),
     })
       .then((response) => response.json())
       .then((data) => {
         // table
-        table(data);
+        if (data.status === 400) {
+          alert(data.message);
+          return;
+        }
+
+        // table
+        if (path.includes("surplus")) {
+          tableSurplus(data);
+        } else {
+          table(data);
+        }
 
         // pagination script
         pagination(data);
@@ -263,16 +347,32 @@ if (previous) {
   previous.addEventListener("click", function (event) {
     event.preventDefault();
 
-    const previous_page = document.getElementById("previous_page").textContent;
-    const page_size = document.getElementById("page_size").value;
-    const begin_date = document.getElementById("begin_date").value;
-    const end_date = document.getElementById("end_date").value;
-    const no_polis = document.getElementById("no_polis").value;
-    const no_cif = document.getElementById("no_cif").value;
-    const client_name = document.getElementById("client_name").value;
-    const branch = document.getElementById("branch").value;
-    const business = document.getElementById("business").value;
-    const sumbis = document.getElementById("sumbis").value;
+    if (periode) {
+      dataReq = {
+        page: previous_page.textContent,
+        page_size: page_size.value,
+        periode: periode.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    } else {
+      dataReq = {
+        page: previous_page.textContent,
+        page_size: page_size.value,
+        begin_date: begin_date.value,
+        end_date: end_date.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    }
 
     const url = window.location.href;
     const path = url.split("/").pop();
@@ -283,23 +383,22 @@ if (previous) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        page: previous_page,
-        page_size: page_size,
-        begin_date: begin_date,
-        end_date: end_date,
-        no_polis: no_polis,
-        no_cif: no_cif,
-        client_name: client_name,
-        branch: branch,
-        business: business,
-        sumbis: sumbis,
-      }),
+      body: JSON.stringify(dataReq),
     })
       .then((response) => response.json())
       .then((data) => {
         // table
-        table(data);
+        if (data.status === 400) {
+          alert(data.message);
+          return;
+        }
+
+        // table
+        if (path.includes("surplus")) {
+          tableSurplus(data);
+        } else {
+          table(data);
+        }
 
         // pagination script
         pagination(data);
@@ -312,16 +411,32 @@ if (next) {
   next.addEventListener("click", function (event) {
     event.preventDefault();
 
-    const next_page = document.getElementById("next_page").textContent;
-    const page_size = document.getElementById("page_size").value;
-    const begin_date = document.getElementById("begin_date").value;
-    const end_date = document.getElementById("end_date").value;
-    const no_polis = document.getElementById("no_polis").value;
-    const no_cif = document.getElementById("no_cif").value;
-    const client_name = document.getElementById("client_name").value;
-    const branch = document.getElementById("branch").value;
-    const business = document.getElementById("business").value;
-    const sumbis = document.getElementById("sumbis").value;
+    if (periode) {
+      dataReq = {
+        page: next_page.textContent,
+        page_size: page_size.value,
+        periode: periode.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    } else {
+      dataReq = {
+        page: next_page.textContent,
+        page_size: page_size.value,
+        begin_date: begin_date.value,
+        end_date: end_date.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    }
 
     const url = window.location.href;
     const path = url.split("/").pop();
@@ -332,23 +447,22 @@ if (next) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        page: next_page,
-        page_size: page_size,
-        begin_date: begin_date,
-        end_date: end_date,
-        no_polis: no_polis,
-        no_cif: no_cif,
-        client_name: client_name,
-        branch: branch,
-        business: business,
-        sumbis: sumbis,
-      }),
+      body: JSON.stringify(dataReq),
     })
       .then((response) => response.json())
       .then((data) => {
         // table
-        table(data);
+        if (data.status === 400) {
+          alert(data.message);
+          return;
+        }
+
+        // table
+        if (path.includes("surplus")) {
+          tableSurplus(data);
+        } else {
+          table(data);
+        }
 
         // pagination script
         pagination(data);
@@ -361,14 +475,28 @@ if (exportBtn) {
   exportBtn.addEventListener("click", function (event) {
     event.preventDefault();
 
-    const begin_date = document.getElementById("begin_date").value;
-    const end_date = document.getElementById("end_date").value;
-    const no_polis = document.getElementById("no_polis").value;
-    const no_cif = document.getElementById("no_cif").value;
-    const client_name = document.getElementById("client_name").value;
-    const branch = document.getElementById("branch").value;
-    const business = document.getElementById("business").value;
-    const sumbis = document.getElementById("sumbis").value;
+    if (periode) {
+      dataReq = {
+        periode: periode.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    } else {
+      dataReq = {
+        begin_date: begin_date.value,
+        end_date: end_date.value,
+        no_polis: no_polis.value,
+        no_cif: no_cif.value,
+        client_name: client_name.value,
+        branch: branch.value,
+        business: business.value,
+        sumbis: sumbis.value,
+      };
+    }
 
     const url = window.location.href;
     const path = url.split("/").pop();
@@ -379,16 +507,7 @@ if (exportBtn) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        begin_date: begin_date,
-        end_date: end_date,
-        no_polis: no_polis,
-        no_cif: no_cif,
-        client_name: client_name,
-        branch: branch,
-        business: business,
-        sumbis: sumbis,
-      }),
+      body: JSON.stringify(dataReq),
     })
       .then((response) => {
         if (!response.ok) {

@@ -51,7 +51,7 @@ func main() {
 	router.POST("/api/export-production-yearly", production.ExportProdYr)
 
 	// surplus lt
-	router.GET("/api/surplus-longterm", surplus.SurplusLt)
+	router.POST("/api/surplus-longterm", surplus.SurplusLt)
 
 	// master
 	router.GET("/api/branch", master.GetBranch)

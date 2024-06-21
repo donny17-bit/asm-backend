@@ -51,3 +51,59 @@ function table(data) {
   table.style.maxHeight = "1200px";
   table.style.overflowY = "visible";
 }
+
+function tableSurplus(data) {
+  const totalData = document.getElementById("total_data");
+  totalData.textContent = data.total_data;
+
+  const tableBody = document.querySelector("#dataTable tbody");
+  tableBody.innerHTML = "";
+  data.data.forEach((item) => {
+    tableBody.innerHTML += `<tr>
+                                        <td>${item.Rn}</td>
+                                        <td>${item.Periode}</td>
+                                        <td>${item.Kanwil}</td>
+                                        <td>${item.Cabang}</td>
+                                        <td>${item.Perwakilan}</td>
+                                        <td>${item.SubPerwakilan}</td>
+                                        <td>${item.Namaleader0}</td>
+                                        <td>${item.Namaleader1}</td>
+                                        <td>${item.Namaleader2}</td>
+                                        <td>${item.Namaleader3}</td>
+                                        <td>${item.Mo}</td>
+                                        <td>${item.GroupBusiness}</td>
+                                        <td>${item.Business}</td>
+                                        <td>${item.ClientName}</td>
+                                        <td>${item.NoPolis}</td>
+                                        <td>${item.NoCif}</td>
+                                        <td>${item.JenisPaket}</td>
+                                        <td>${item.Keterangan}</td>
+                                        <td>${item.NamaCeding}</td>
+                                        <td>${item.NamaDealer}</td>
+                                        <td>${item.Tsi}</td>
+                                        <td>${item.Gpw}</td>
+                                        <td>${item.Disc}</td>
+                                        <td>${item.Disc2}</td>
+                                        <td>${item.Comm}</td>
+                                        <td>${item.Oc}</td>
+                                        <td>${item.Bkp}</td>
+                                        <td>${item.Ngpw}</td>
+                                        <td>${item.Ri}</td>
+                                        <td>${item.Ricom}</td>
+                                        <td>${item.Npw}</td>
+                                        <td>${item.CadPremi}</td>
+                                        <td>${item.CadPremi1}</td>
+                                        <td>${item.PremiumReserve}</td>
+                                        <td>${item.Npe}</td>
+                                        <td>${item.AcceptedClaim}</td>			
+                                        <td>${item.RejectedClaim}</td>
+                                        <td>${item.OutstandingClaim}</td>
+                                        <td>${item.ReversedClaim}</td>
+                                        <td>${item.SurplusUw}</td>
+                                      </tr>`;
+  });
+
+  const table = document.getElementById("tableContainer");
+  table.style.maxHeight = "1200px";
+  table.style.overflowY = "visible";
+}
