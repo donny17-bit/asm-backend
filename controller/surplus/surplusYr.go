@@ -62,7 +62,7 @@ func SurplusYr(c *gin.Context) {
 
 	// cek total row ----------------------------------------------------------------
 	queryRow := "select count(1) as total_row FROM prodclaimuwmththn_gabungan_view A INNER JOIN MV_AGEN MA ON A.LAG_ID = MA.LAG_AGEN_ID INNER JOIN LST_CABANG LC ON A.LDC_ID = LC.LDC_ID INNER JOIN LST_BUSINESS LB ON A.LBU_ID = LB.LBU_ID INNER JOIN LST_GRP_BUSINESS LGB ON LB.LGB_ID = LGB.LGB_ID LEFT OUTER JOIN LST_MO MO ON A.LMO_ID = MO.LMO_ID LEFT OUTER JOIN mst_client mc ON A.client_ID = mc.mcl_ID LEFT OUTER JOIN Warehouse_Asm.dbo.LST_JENIS_COAS JN_COAS ON A.MDS_JN_COAS = JN_COAS.MDS_JN_COAS "
-	whereRow := "where a.ldc_id = '" + ldc_id.(string) + "' and left(mthname, len(mthname) - 3) = '"+periode+"' "
+	whereRow := "where a.ldc_id = '" + ldc_id.(string) + "' and proddatetime = '"+periode+"' "
 	queryRow = queryRow + whereRow
 
 	// filter polis
@@ -154,8 +154,8 @@ func SurplusYr(c *gin.Context) {
 
 	// get query
 	// var queryFinal string
-	queryFinal := "exec SP_SURPLUS_LONGTERM_CIF " + " "
-	where := " '"+ order +"', '"+ sort +"', '"+ page +"', '"+ pageSize +"', 'where a.ldc_id = ''"+ ldc_id.(string) +"'' and left(mthname, len(mthname) - 3) = ''"+ periode +"''  "
+	queryFinal := "exec SP_SURPLUS_YEAR_CIF " + " "
+	where := " '"+ order +"', '"+ sort +"', '"+ page +"', '"+ pageSize +"', 'where a.ldc_id = ''"+ ldc_id.(string) +"'' and proddatetime = ''"+ periode +"''  "
 
 	queryFinal = queryFinal + where
 
@@ -214,18 +214,18 @@ func SurplusYr(c *gin.Context) {
 	defer rows.Close()
 
 	// Create an array to store the query results
-	var datas []Data
+	var datas []DataYearly
 
 	for rows.Next() {
-		var data Data
+		var data DataYearly
 		// var JenisPaketSql sql.NullString
 		// var NamaCedingSql sql.NullString
 
 		// Scan each row into a struct
 		err := rows.Scan(
 			&data.Rn,
-			&data.Mthname,
-			&data.Periode,
+			&data.Proddatetime,
+			&data.Prodkey,
 			&data.Kanwil,
 			&data.Cabang,
 			&data.Perwakilan,
@@ -243,6 +243,7 @@ func SurplusYr(c *gin.Context) {
 			&data.JenisPaket,
 			&data.Keterangan,
 			&data.NamaCeding,
+			&data.Okupasi,
 			&data.NamaDealer,
 			&data.Tsi,
 			&data.Gpw,

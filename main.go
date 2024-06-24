@@ -52,6 +52,7 @@ func main() {
 
 	// surplus lt
 	router.POST("/api/surplus-longterm", surplus.SurplusLt)
+	router.POST("/api/surplus-yearly", surplus.SurplusYr)
 
 	// master
 	router.GET("/api/branch", master.GetBranch)

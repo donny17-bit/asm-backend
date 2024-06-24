@@ -74,7 +74,11 @@ if (formFilter) {
 
         // table
         if (path.includes("surplus")) {
-          tableSurplus(data);
+          if (path.includes("yearly")) {
+            tableSurplusYr(data);
+          } else {
+            tableSurplus(data);
+          }
         } else {
           table(data);
         }
@@ -87,7 +91,7 @@ if (formFilter) {
       });
   });
 }
-
+make;
 if (nextPage) {
   nextPage.addEventListener("click", function (event) {
     event.preventDefault();
