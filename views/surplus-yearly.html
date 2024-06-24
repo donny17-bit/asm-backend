@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <title>Surplus UW Yearly | E-Report Sinarmas</title>
+
+    <!-- Custom fonts for this template -->
+    <link
+      href="../static/vendor/fontawesome-free/css/all.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+      rel="stylesheet"
+    />
+
+    <!-- Custom styles for this template -->
+    <link href="../static/css/sb-admin-2.css" rel="stylesheet" />
+    <link href="../static/css/addon.css" rel="stylesheet" />
+
+    <!-- Custom styles for this page -->
+    <link
+      href="../static/vendor/datatables/dataTables.bootstrap4.min.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+      <!-- Sidebar -->
+      <ul
+        class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+        id="accordionSidebar"
+      >
+        <!-- Sidebar - Brand -->
+        <a
+          class="sidebar-brand d-flex align-items-center justify-content-center"
+          href="/dashboard"
+        >
+          <!-- <img class="img-profile rounded-circle" src="../static/image/undraw_profile.svg"> -->
+          <img class="sidebar-img" src="../static/image/logo-png.png" />
+          <div class="sidebar-brand-text mx-3">E-Report Sinarmas</div>
+        </a>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider my-0" />
+
+        <!-- Dashboard -->
+        <li class="nav-item mt-4">
+          <a class="nav-link" href="/dashboard">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span></a
+          >
+        </li>
+
+        <!-- Produksi -->
+        <li class="nav-item mt-0">
+          <a
+            class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#produksi"
+            aria-expanded="true"
+            aria-controls="collapseTwo"
+          >
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Produksi</span>
+          </a>
+          <div
+            id="produksi"
+            class="collapse"
+            aria-labelledby="headingTwo"
+            data-parent="#accordionSidebar"
+          >
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" href="/production-longterm"
+                >Produksi Longterm</a
+              >
+              <a class="collapse-item" href="/production-yearly"
+                >Produksi Yearly</a
+              >
+            </div>
+          </div>
+        </li>
+
+        <!-- Surplus -->
+        <li class="nav-item">
+          <a
+            class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#surplus"
+            aria-expanded="true"
+            aria-controls="collapseUtilities"
+          >
+            <i class="fas fa-fw fa-wrench"></i>
+            <span>Surplus</span>
+          </a>
+          <div
+            id="surplus"
+            class="collapse"
+            aria-labelledby="headingUtilities"
+            data-parent="#accordionSidebar"
+          >
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" href="/surplus-longterm"
+                >Surplus Longterm</a
+              >
+              <a class="collapse-item" href="/surplus-yearly">Surplus Yearly</a>
+            </div>
+          </div>
+        </li>
+
+        <!-- Claim -->
+        <li class="nav-item">
+          <a
+            class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#claim"
+            aria-expanded="true"
+            aria-controls="collapseUtilities"
+          >
+            <i class="fas fa-fw fa-wrench"></i>
+            <span>Claim</span>
+          </a>
+          <div
+            id="claim"
+            class="collapse"
+            aria-labelledby="headingUtilities"
+            data-parent="#accordionSidebar"
+          >
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" href="#">Accepted Claim</a>
+              <a class="collapse-item" href="#">Rejected Claim</a>
+              <a class="collapse-item" href="#">Outstanding Claim</a>
+            </div>
+          </div>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider d-none d-md-block" />
+
+        <!-- Sidebar Toggler (Sidebar) -->
+        <div class="text-center d-none d-md-inline">
+          <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+      </ul>
+      <!-- End of Sidebar -->
+
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <!-- Topbar -->
+          <nav
+            class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow"
+          >
+            <!-- Topbar Title -->
+            <div
+              class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100"
+            >
+              <h4>Surplus UW Yearly</h4>
+            </div>
+
+            <!-- Topbar Navbar -->
+            <ul class="navbar-nav ml-auto">
+              <div class="topbar-divider d-none d-sm-block"></div>
+
+              <!-- User -->
+              <li class="nav-item dropdown no-arrow">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  id="userDropdown"
+                  role="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <span class="mr-2 d-none d-lg-inline text-gray-600 small"
+                    >{{.nama}}</span
+                  >
+                  <img
+                    class="img-profile rounded-circle"
+                    src="../static/image/undraw_profile.svg"
+                  />
+                </a>
+                <!-- Dropdown - User -->
+                <div
+                  class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                  aria-labelledby="userDropdown"
+                >
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-toggle="modal"
+                    data-target="#logoutModal"
+                  >
+                    <i
+                      class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"
+                    ></i>
+                    Logout
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </nav>
+          <!-- End of Topbar -->
+
+          <!-- Begin Page Content -->
+          <div class="container-fluid">
+            <!-- filter -->
+            <div class="card shadow mb-4">
+              <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Filter</h6>
+              </div>
+              <div class="card-body">
+                <form id="formFilter">
+                  <p>Periode</p>
+                  <select class="form-select" id="periode">
+                    {{ range .proddate}}
+                    <option value="{{.}}">{{.}}</option>
+                    {{ end}}
+                  </select>
+                  <!-- end select tag -->
+
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      margin-top: 20px;
+                    "
+                  >
+                    <!-- form 1 -->
+                    <div class="mr-5" style="flex: 1">
+                      <div style="display: flex">
+                        <p style="flex: 1" class="mt-2">No Polis</p>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="no_polis"
+                          id="no_polis"
+                          style="flex: 4"
+                        />
+                      </div>
+                      <div style="display: flex">
+                        <p style="flex: 1" class="mt-2">No CIF</p>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="no_cif"
+                          id="no_cif"
+                          style="flex: 4"
+                        />
+                      </div>
+                      <div style="display: flex">
+                        <p style="flex: 1" class="mt-2">Nama Client</p>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="client_name"
+                          id="client_name"
+                          style="flex: 4"
+                        />
+                      </div>
+                    </div>
+                    <!-- form 2 -->
+                    <div style="flex: 1">
+                      <div style="display: flex">
+                        <p style="flex: 1" class="mt-2">Cabang</p>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="branch"
+                          id="branch"
+                          style="flex: 4"
+                        />
+                      </div>
+                      <div style="display: flex">
+                        <p style="flex: 1" class="mt-2">Bisnis</p>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="business"
+                          id="business"
+                          style="flex: 4"
+                        />
+                      </div>
+                      <div style="display: flex">
+                        <p style="flex: 1" class="mt-2">Sumber Bisnis</p>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="sumbis"
+                          id="sumbis"
+                          style="flex: 4"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-end mt-4">
+                    <button
+                      class="btn btn-primary mr-2"
+                      type="submit"
+                      style="width: 150px"
+                    >
+                      submit
+                    </button>
+                    <!-- clear button -->
+                    <button
+                      class="btn btn-secondary"
+                      id="clear"
+                      type="button"
+                      style="width: 150px"
+                    >
+                      clear
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="card shadow mb-4" id="tableDisplay">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <!-- filter row show data -->
+                  <div class="d-flex">
+                    <p class="mt-2">Show</p>
+                    <div class="dropdown mx-2">
+                      <button
+                        class="btn btn-outline-secondary dropdown-toggle"
+                        type="button"
+                        id="page_size"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        value="10"
+                      >
+                        10
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li>
+                          <a class="dropdown-item" id="page_size_10">10</a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" id="page_size_50">50</a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" id="page_size_100">100</a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" id="page_size_500">500</a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" id="page_size_1000">1000</a>
+                        </li>
+                      </ul>
+                    </div>
+                    <p class="mt-2">entries</p>
+                  </div>
+                  <button
+                    class="btn btn-sm btn-success mb-2"
+                    type="button"
+                    id="export"
+                    style="height: 40px"
+                  >
+                    Download Excel
+                  </button>
+                </div>
+
+                <!-- table data -->
+                <div class="table-responsive" id="tableContainer">
+                  <table
+                    class="table table-bordered"
+                    id="dataTable"
+                    width="100%"
+                    cellspacing="0"
+                  >
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>Periode</th>
+                        <th>Kanwil</th>
+                        <th>Cabang</th>
+                        <th>Perwakilan</th>
+                        <th>Sub Perwakilan</th>
+                        <th>Namaleader0</th>
+                        <th>Namaleader1</th>
+                        <th>Namaleader2</th>
+                        <th>Namaleader3</th>
+                        <th>Mo</th>
+                        <th>Group Business</th>
+                        <th>Business</th>
+                        <th>Client Name</th>
+                        <th>No Polis</th>
+                        <th>No Cif</th>
+                        <th>Jenis Paket</th>
+                        <th>Keterangan</th>
+                        <th>Nama Ceding</th>
+                        <th>Nama Dealer</th>
+                        <th>TSI</th>
+                        <th>GPW</th>
+                        <th>Disc</th>
+                        <th>Disc 2</th>
+                        <th>Comm</th>
+                        <th>OC</th>
+                        <th>Biaya Kantor Pusat</th>
+                        <th>NGPW</th>
+                        <th>RI</th>
+                        <th>Ricom</th>
+                        <th>NPW</th>
+                        <th>Cadangan Premi Tahun Lalu</th>
+                        <th>Cadangan Premi Tahun Berjalan</th>
+                        <th>Premium Reserve</th>
+                        <th>NPE</th>
+                        <th>Accepted Claim</th>
+                        <th>Rejected Claim</th>
+                        <th>Outstanding Claim</th>
+                        <th>Reversed Claim</th>
+                        <th>Surplus Deficit UW</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+
+                <div class="d-flex justify-content-between mt-3">
+                  <!-- data information -->
+                  <div class="d-flex mt-2">
+                    <p>Total data :&nbsp;</p>
+                    <p id="total_data">0</p>
+                  </div>
+                  <!-- pagination -->
+                  <div class="d-flex" id="pagination">
+                    <button
+                      class="btn btn-outline-secondary mb-2 disabled"
+                      id="previous"
+                      type="button"
+                      style="
+                        height: 35px;
+                        width: 50px;
+                        border-radius: 8px 0% 0% 8px;
+                      "
+                    >
+                      <<
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="first_page"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      1
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="more_previous"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      ...
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="previous_page"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      2
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 disabled"
+                      id="current_page"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      1
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="next_page"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      4
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="more_next"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      ...
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 d-none"
+                      id="last_page"
+                      type="button"
+                      style="height: 35px; border-radius: 0px"
+                    >
+                      1
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary mb-2 rounded-end disabled"
+                      id="next"
+                      type="button"
+                      style="
+                        height: 35px;
+                        width: 50px;
+                        border-radius: 0px 8px 8px 0px;
+                      "
+                    >
+                      >>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+      </div>
+      <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div
+      class="modal fade"
+      id="logoutModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+            <button
+              class="close"
+              type="button"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Select "Logout" below if you are ready to end your current session.
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-secondary"
+              type="button"
+              data-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" id="logout" class="btn btn-primary">
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="../static/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="../static/js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <!-- <script src="../static/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="../static/vendor/datatables/dataTables.bootstrap4.min.js"></script> -->
+
+    <!-- Page level custom scripts -->
+    <script src="../static/js/demo/datatables-demo.js"></script>
+    <script src="../static/js/fetch.js"></script>
+    <script src="../static/js/table.js"></script>
+    <script src="../static/js/pagination.js"></script>
+    <script src="../static/js/pageSize.js"></script>
+    <script src="../static/js/filter.js"></script>
+  </body>
+</html>

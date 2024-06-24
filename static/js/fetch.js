@@ -285,7 +285,7 @@ if (lastPage) {
 
     if (periode) {
       dataReq = {
-        page: "1",
+        page: last_page.textContent,
         page_size: page_size.value,
         periode: periode.value,
         no_polis: no_polis.value,
@@ -309,6 +309,8 @@ if (lastPage) {
         sumbis: sumbis.value,
       };
     }
+
+    console.log("data req : ", dataReq);
 
     const url = window.location.href;
     const path = url.split("/").pop();

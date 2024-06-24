@@ -2,7 +2,6 @@ package views
 
 import (
 	"asm-backend/controller/master"
-	// "fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -55,3 +54,13 @@ func GetSurplusLt(c *gin.Context) {
     })
 }
 
+func GetSurplusYr(c *gin.Context) {
+	session := sessions.Default(c)
+	nama := session.Get("nama")
+	proddate := master.Proddate()
+
+	c.HTML(http.StatusOK, "surplus-yearly.html", gin.H{
+        "nama": nama,
+		"proddate" : proddate,
+    })
+}

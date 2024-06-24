@@ -40,7 +40,7 @@ func main() {
 	router.GET("/production-longterm", views.GetProductionLt)
 	router.GET("/production-yearly", views.GetProductionYr)
 	router.GET("/surplus-longterm", views.GetSurplusLt)
-	// router.GET("/surplus-yearly", views.GetSurplusYr)
+	router.GET("/surplus-yearly", views.GetSurplusYr)
 
 	// production lt
 	router.POST("/api/production-longterm", production.ProductionLt)
