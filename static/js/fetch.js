@@ -91,7 +91,7 @@ if (formFilter) {
       });
   });
 }
-make;
+
 if (nextPage) {
   nextPage.addEventListener("click", function (event) {
     event.preventDefault();
@@ -143,7 +143,11 @@ if (nextPage) {
 
         // table
         if (path.includes("surplus")) {
-          tableSurplus(data);
+          if (path.includes("yearly")) {
+            tableSurplusYr(data);
+          } else {
+            tableSurplus(data);
+          }
         } else {
           table(data);
         }
@@ -207,7 +211,11 @@ if (previousPage) {
 
         // table
         if (path.includes("surplus")) {
-          tableSurplus(data);
+          if (path.includes("yearly")) {
+            tableSurplusYr(data);
+          } else {
+            tableSurplus(data);
+          }
         } else {
           table(data);
         }
@@ -271,7 +279,11 @@ if (firstPage) {
 
         // table
         if (path.includes("surplus")) {
-          tableSurplus(data);
+          if (path.includes("yearly")) {
+            tableSurplusYr(data);
+          } else {
+            tableSurplus(data);
+          }
         } else {
           table(data);
         }
@@ -337,7 +349,11 @@ if (lastPage) {
 
         // table
         if (path.includes("surplus")) {
-          tableSurplus(data);
+          if (path.includes("yearly")) {
+            tableSurplusYr(data);
+          } else {
+            tableSurplus(data);
+          }
         } else {
           table(data);
         }
@@ -401,7 +417,11 @@ if (previous) {
 
         // table
         if (path.includes("surplus")) {
-          tableSurplus(data);
+          if (path.includes("yearly")) {
+            tableSurplusYr(data);
+          } else {
+            tableSurplus(data);
+          }
         } else {
           table(data);
         }
@@ -465,7 +485,11 @@ if (next) {
 
         // table
         if (path.includes("surplus")) {
-          tableSurplus(data);
+          if (path.includes("yearly")) {
+            tableSurplusYr(data);
+          } else {
+            tableSurplus(data);
+          }
         } else {
           table(data);
         }
