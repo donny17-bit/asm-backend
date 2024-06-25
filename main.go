@@ -2,6 +2,7 @@ package main
 
 import (
 	"asm-backend/controller/auth"
+	"asm-backend/controller/claim"
 	"asm-backend/controller/master"
 	"asm-backend/controller/production"
 	"asm-backend/controller/surplus"
@@ -41,6 +42,7 @@ func main() {
 	router.GET("/production-yearly", views.GetProductionYr)
 	router.GET("/surplus-longterm", views.GetSurplusLt)
 	router.GET("/surplus-yearly", views.GetSurplusYr)
+	router.GET("/accepted-claim", views.GetAcceptedClaim)
 
 	// production lt
 	router.POST("/api/production-longterm", production.ProductionLt)
@@ -53,6 +55,9 @@ func main() {
 	// surplus lt
 	router.POST("/api/surplus-longterm", surplus.SurplusLt)
 	router.POST("/api/surplus-yearly", surplus.SurplusYr)
+
+	// claim 
+	router.POST("/api/accepted-claim", claim.Accepted)
 
 	// master
 	router.GET("/api/branch", master.GetBranch)

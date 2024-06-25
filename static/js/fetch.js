@@ -80,7 +80,11 @@ if (formFilter) {
             tableSurplus(data);
           }
         } else {
-          table(data);
+          if (path.includes("accepted")) {
+            tableAccept(data);
+          } else {
+            table(data);
+          }
         }
 
         // pagination script
@@ -149,7 +153,11 @@ if (nextPage) {
             tableSurplus(data);
           }
         } else {
-          table(data);
+          if (path.includes("accepted")) {
+            tableAccept(data);
+          } else {
+            table(data);
+          }
         }
 
         // pagination script
@@ -217,7 +225,11 @@ if (previousPage) {
             tableSurplus(data);
           }
         } else {
-          table(data);
+          if (path.includes("accepted")) {
+            tableAccept(data);
+          } else {
+            table(data);
+          }
         }
 
         // pagination script
@@ -285,7 +297,11 @@ if (firstPage) {
             tableSurplus(data);
           }
         } else {
-          table(data);
+          if (path.includes("accepted")) {
+            tableAccept(data);
+          } else {
+            table(data);
+          }
         }
 
         // pagination script
@@ -355,7 +371,11 @@ if (lastPage) {
             tableSurplus(data);
           }
         } else {
-          table(data);
+          if (path.includes("accepted")) {
+            tableAccept(data);
+          } else {
+            table(data);
+          }
         }
 
         // pagination script
@@ -423,7 +443,11 @@ if (previous) {
             tableSurplus(data);
           }
         } else {
-          table(data);
+          if (path.includes("accepted")) {
+            tableAccept(data);
+          } else {
+            table(data);
+          }
         }
 
         // pagination script
@@ -491,7 +515,11 @@ if (next) {
             tableSurplus(data);
           }
         } else {
-          table(data);
+          if (path.includes("accepted")) {
+            tableAccept(data);
+          } else {
+            table(data);
+          }
         }
 
         // pagination script

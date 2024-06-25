@@ -64,3 +64,15 @@ func GetSurplusYr(c *gin.Context) {
 		"proddate" : proddate,
     })
 }
+
+
+func GetAcceptedClaim(c *gin.Context) {
+	session := sessions.Default(c)
+	nama := session.Get("nama")
+	// proddate := master.Proddate()
+
+	c.HTML(http.StatusOK, "accepted-claim.html", gin.H{
+        "nama": nama,
+		// "proddate" : proddate,
+    })
+}

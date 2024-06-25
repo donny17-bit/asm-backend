@@ -165,3 +165,76 @@ function tableSurplusYr(data) {
   table.style.maxHeight = "1200px";
   table.style.overflowY = "visible";
 }
+
+function tableAccept(data) {
+  console.log(data);
+  const totalData = document.getElementById("total_data");
+  totalData.textContent = data.total_data;
+
+  const tableBody = document.querySelector("#dataTable tbody");
+  tableBody.innerHTML = "";
+  data.data.forEach((item) => {
+    tableBody.innerHTML += `<tr>
+                                        <td>${item.Rn}</td>
+                                        <td>${item.Kanwil}</td>
+                                        <td>${item.Cabang}</td>
+                                        <td>${item.Perwakilan}</td>
+                                        <td>${item.SubPerwakilan}</td>
+                                        <td>${item.Namaleader0}</td>
+                                        <td>${item.Namaleader1}</td>
+                                        <td>${item.Namaleader2}</td>
+                                        <td>${item.Namaleader3}</td>
+                                        <td>${item.GroupBusiness}</td>
+                                        <td>${item.Business}</td>
+                                        <td>${item.TahunPolis}</td>
+                                        <td>${item.AcceptedNo}</td>
+                                        <td>${item.NoKlaim}</td>
+                                        <td>${item.NoPolis}</td>
+                                        <td>${item.NoCif}</td>
+                                        <td>${item.ClientName}</td>
+                                        <td>${item.Mo}</td>
+                                        <td>${item.PrepareDate}</td>
+                                        <td>${item.DateOfLoss}</td>
+                                        <td>${item.AcceptedDate}</td>
+                                        <td>${item.BeginDate}</td>
+                                        <td>${item.EndDate}</td>
+                                        <td>${item.JenisPaket}</td>
+                                        <td>${item.Workshop}</td>
+                                        <td>${item.NamaDealer}</td>
+                                        <td>${item.ColDesk}</td>
+                                        <td>${item.RiskLoc}</td>
+                                        <td>${item.Tsi}</td>
+                                        <td>${item.AcceptedClaim}</td>
+                                        <td>${item.AcceptedClaimRp}</td>
+                                        <td>${item.AccKlaimGrossRp}</td>
+                                        <td>${item.OwnRetention}</td>
+                                        <td>${item.CoIns}</td>
+                                        <td>${item.Psrspl}</td>
+                                        <td>${item.Qsri}</td>
+                                        <td>${item.Er1}</td>
+                                        <td>${item.Surplus1}</td>
+                                        <td>${item.Surplus2}</td>            
+                                        <td>${item.Er2}</td>
+                                        <td>${item.PsrqsRi}</td>
+                                        <td>${item.PsrqsOr}</td>
+                                        <td>${item.Ors}</td>
+                                        <td>${item.Facultative}</td>
+                                        <td>${item.Facobl}</td>
+                                        <td>${item.Bppdan}</td>
+                                        <td>${item.Xl}</td>
+                                        <td>${item.Pss}</td>
+                                        <td>${item.Prgbi}</td>
+                                        <td>${item.Pfra}</td>
+                                        <td>${item.Fsplnsri}</td>
+                                        <td>${item.Psplnsri}</td>
+                                        <td>${item.Fsplnsor}</td>
+                                        <td>${item.Psplnsor}</td>
+                                        <td>${item.Facobsrb}</td>
+                                        <td>${item.Facobindt}</td>
+                                      </tr>`;
+  });
+
+  const table = document.getElementById("tableContainer");
+  table.style.maxHeight = "1200px";
+  table.style.overflowY = "visible";
+}
